@@ -2,10 +2,38 @@
 
 namespace App\Providers;
 
+use App\Models\Menu;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    private function setGlobalMenus()
+    {
+        $segment1 = request()->segment(1);
+        $menus = collect([]);
+
+        if ($segment1 === 'administrator') {
+            $menus = Menu::whereNull('parent_id')
+                            ->where('path', 'like', '/administrator/%')
+                            ->get();
+            $subMenus = Menu::whereNotNull('parent_id')->get()->groupBy('parent_id');
+
+            $subMenus->each(function ($items, $parentId) use ($menus) {
+                $targetMenu = $menus->firstWhere('id', $parentId);
+                if ($targetMenu) {
+                    $targetMenu['sub_menus'] = $items;
+                }
+            });
+        }
+
+        $activeMenu = $menus->firstWhere('path', request()->getPathInfo());
+
+        View::share('menus', $menus);
+        View::share('activeMenu', $activeMenu);
+        config(['global.menus' => $menus]);
+    }
+
     /**
      * Register any application services.
      *
@@ -23,6 +51,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->setGlobalMenus();
     }
 }

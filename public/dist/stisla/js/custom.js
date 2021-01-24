@@ -57,7 +57,7 @@ for (let i = 0; i < logoutButtons.length; i++) {
 }
 
 // Delete Promp
-$('body').on('click', '.delete-prompt-trigger', function (e) {
+$(document).on('click', '.delete-prompt-trigger', function (e) {
   e.preventDefault()
 
   const $btn = $(this)
@@ -65,7 +65,7 @@ $('body').on('click', '.delete-prompt-trigger', function (e) {
 
   Swal.fire({
     icon: 'warning',
-    title: `Are you sure want to delete ${itemName}?`,
+    title: `Are you sure want to delete "${itemName}" ?`,
     text: "You will not be able to recover this imaginary file!",
     reverseButtons: true,
     showCancelButton: true,
@@ -84,10 +84,12 @@ $('body').on('click', '.delete-prompt-trigger', function (e) {
           Swal.fire({
             icon: 'success',
             title: 'Complete!',
-            text: `${itemName} has been deleted.`,
+            text: `"${itemName}" has been deleted.`,
           })
 
-          $($btn.data('table-selector')).DataTable().ajax.reload(null, false)
+          if ($btn.hasClass('has-datatable')) {
+            $($btn.data('datatable')).DataTable().ajax.reload(null, false)
+          }
         })
         .fail(() => Swal.fire({
           icon: 'error',
@@ -99,7 +101,7 @@ $('body').on('click', '.delete-prompt-trigger', function (e) {
 })
 
 // Modal Api Trigger
-$('body').on('click', '.btn-modal-trigger[data-modal]', function (e) {
+$(document).on('click', '.btn-modal-trigger[data-modal]', function (e) {
   e.preventDefault()
 
   const $btn = $(this)
@@ -127,7 +129,7 @@ $('body').on('click', '.btn-modal-trigger[data-modal]', function (e) {
 })
 
 // Export Modal Form Submit
-$('body').on('submit', '.export-modal form', function (e) {
+$(document).on('submit', '.export-modal form', function (e) {
   e.preventDefault()
   const $form = $(this)
   const url = $form.attr('action')
@@ -146,7 +148,7 @@ $('body').on('submit', '.export-modal form', function (e) {
 })
 
 // Normal Form
-$('body').on('submit', 'form.need-ajax', function (e) {
+$(document).on('submit', 'form.need-ajax', function (e) {
   e.preventDefault()
 
   const $form = $(this)
@@ -172,7 +174,7 @@ $('body').on('submit', 'form.need-ajax', function (e) {
         const $dataTable = $($form.data('datatable'))
         const stayPaging = $form.data('stay-paging')
 
-        stayPaging == 'true'
+        stayPaging == '1'
           ? $dataTable.DataTable().ajax.reload(null, false)
           : $dataTable.DataTable().order([0, 'desc']).draw()
       }

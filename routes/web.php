@@ -20,4 +20,5 @@ Route::get('/', function () {
 Route::prefix('/administrator')->name('administrator.')->group(function () {
     require __DIR__.'/administrator/auth.php';
     require __DIR__.'/administrator/dashboard.php';
+    require __DIR__.'/administrator/menus.php';
 });

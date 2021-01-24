@@ -17,7 +17,7 @@ class CreateMenusTable extends Migration
             $table->id();
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('name');
-            $table->string('icon');
+            $table->string('icon')->nullable();
             $table->string('path')->unique();
             $table->enum('has_sub_menus', ['Y', 'N'])->default('N');
             $table->timestamps();

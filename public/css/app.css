@@ -1,0 +1,4 @@
+table.has-actions tbody tr td:last-child {
+    display: flex;
+    gap: 0.5rem;
+}
