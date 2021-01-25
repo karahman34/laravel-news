@@ -1,4 +1,4 @@
-table.has-actions tbody tr td:last-child {
+table.has-actions tbody tr td:last-child:not(.dataTables_empty) {
     display: flex;
     gap: 0.5rem;
 }
