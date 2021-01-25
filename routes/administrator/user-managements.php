@@ -10,4 +10,9 @@ Route::prefix('user-managements')->name('user-managements.')->middleware(['auth'
     Route::prefix('roles')->name('roles.')->group(function () {
         Route::post('/{role}/sync-permissions', [RoleController::class, 'syncPermissions'])->name('sync_permissions');
     });
+
+    // Permissions
+    Route::prefix('permissions')->name('permissions.')->group(function () {
+        Route::get('/', [PermissionController::class, 'index'])->name('index');
+    });
 });
