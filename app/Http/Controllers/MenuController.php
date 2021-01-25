@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MenuRequest;
 use App\Models\Menu;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\DataTables;
 
 class MenuController extends Controller
 {
+    private $menuPathPrefix = '/administrator';
+
     /**
      * Display a listing of the resource.
      *
@@ -30,11 +33,13 @@ class MenuController extends Controller
 
         return DataTables::of(Menu::query())
                             ->addColumn('actions', function ($menu) {
+                                $permissionsButton = '<a href="'.route('administrator.menus.permissions.index', ['menu' => $menu]).'" class="btn btn-info btn-modal-trigger" data-modal="#menu-permissions-modal"><i class="fas fa-lock"></i></a>';
+
                                 $editButton = '<a href="'.route('administrator.menus.edit', ['menu' => $menu]).'" class="btn btn-warning btn-modal-trigger" data-modal="#form-menu-modal"><i class="fas fa-edit"></i></a>';
                                 
                                 $deleteButton = '<a href="'.route('administrator.menus.destroy', ['menu' => $menu]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#menu-datatable" data-item-name="'.$menu->name.'"><i class="fas fa-trash"></i></a>';
 
-                                return $editButton . $deleteButton;
+                                return $permissionsButton . $editButton . $deleteButton;
                             })
                             ->rawColumns(['actions'])
                             ->make(true);
@@ -48,6 +53,34 @@ class MenuController extends Controller
     public function create()
     {
         return view('components.menu.form-modal');
+    }
+
+    /**
+     * Format menu path.
+     *
+     * @param   string  $path
+     * @param   string|int  $parentId
+     *
+     * @return  string|JsonResponse
+     */
+    private function setMenuPath(string $path, $parentId)
+    {
+        if (is_numeric($parentId)) {
+            $parentMenu = Menu::select('id', 'path')->whereId($parentId)->first();
+
+            if (!$parentMenu) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'Parent menu is invalid.',
+                ], 404);
+            }
+
+            $path = $parentMenu->path . $path;
+        } else {
+            $path = $this->menuPathPrefix . $path;
+        }
+
+        return $path;
     }
 
     /**
@@ -66,19 +99,10 @@ class MenuController extends Controller
             'has_sub_menus',
         ]);
 
-        if (is_numeric($payload['parent_id'])) {
-            $parentMenu = Menu::select('id', 'path')->whereId($payload['parent_id'])->first();
+        // Set menu path.
+        $payload['path'] = $this->setMenuPath($payload['path'], $payload['parent_id']);
 
-            if (!$parentMenu) {
-                return response()->json([
-                    'ok' => false,
-                    'message' => 'Parent menu is invalid.',
-                ], 404);
-            }
-
-            $payload['path'] = $parentMenu->path . $payload['path'];
-        }
-
+        // Create menu model.
         $menu = Menu::create($payload);
 
         return response()->json([
@@ -131,6 +155,25 @@ class MenuController extends Controller
     }
 
     /**
+     * Update permissions name.
+     *
+     * @param   string  $oldName
+     * @param   string  $newName
+     *
+     * @return  void
+     */
+    public function updatePermissionNames(string $oldName, string $newName)
+    {
+        $permissions = Permission::where('name', 'like', $oldName. '-%')->get();
+        $permissions->each(function (Permission $permission) use ($newName) {
+            $name = explode('-', $permission->name);
+            $name[0] = $newName;
+            $permission->name = implode('-', $name);
+            $permission->save();
+        });
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  MenuRequest  $menuRequest
@@ -140,6 +183,7 @@ class MenuController extends Controller
     public function update(MenuRequest $menuRequest, Menu $menu)
     {
         $oldPath = $menu->path;
+        $oldName = $menu->name;
         $payload = $menuRequest->only([
             'parent_id',
             'name',
@@ -147,27 +191,22 @@ class MenuController extends Controller
             'has_sub_menus',
         ]);
 
+        // Set menu path.
         if (isset($menuRequest->path) && strlen($menuRequest->path) > 0) {
-            $payload['path'] = $menuRequest->path;
-
-            if (is_numeric($payload['parent_id'])) {
-                $parentMenu = Menu::select('id', 'path')->whereId($payload['parent_id'])->first();
-                
-                if (!$parentMenu) {
-                    return response()->json([
-                        'ok' => false,
-                        'message' => 'Parent menu is invalid.',
-                    ], 404);
-                }
-    
-                $payload['path'] = $parentMenu->path . $payload['path'];
-            }
+            $payload['path'] = $this->setMenuPath($menuRequest->path, $payload['parent_id']);
         }
 
+        // Update menu.
         $menu->update($payload);
 
-        if ($menu->has_sub_menus === 'Y') {
+        // Update child menus path.
+        if ($menu->has_sub_menus === 'Y' && $oldPath !== $menu->path) {
             $this->updateChildMenus($menu->id, $oldPath, $menu->path);
+        }
+
+        // Update permissions name.
+        if ($oldName !== $menu->name) {
+            $this->updatePermissionNames($oldName, $menu->name);
         }
 
         return response()->json([
@@ -185,8 +224,14 @@ class MenuController extends Controller
      */
     public function destroy(Menu $menu)
     {
+        $menuName = $menu->name;
+
+        // Delete menu model.
         $menu->delete();
 
+        // Delete permissions.
+        Permission::where('name', 'like', $menuName. '-%')->delete();
+        
         return response()->json([
             'ok' => true,
             'message' => 'Menu deleted.',

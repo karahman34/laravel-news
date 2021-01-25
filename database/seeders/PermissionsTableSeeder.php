@@ -14,7 +14,7 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run()
     {
-        $data = ['menu-create', 'menu-update', 'menu-delete', 'menu-view'];
+        $data = ['menus-create', 'menus-update', 'menus-delete', 'menus-view'];
 
         foreach ($data as $name) {
             Permission::create(['name' => $name]);

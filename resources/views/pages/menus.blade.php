@@ -92,5 +92,121 @@
       })
     })
 
+    const modalSelector = '#menu-permissions-modal'
+    $(document).on('api-modal.loaded', function(e, modal) {
+
+      if (modal !== modalSelector) return
+
+      const $modal = $(modalSelector)
+      const $dataTable = $modal.find('table')
+      const menuId = $modal.data('menu-id')
+
+      $dataTable.DataTable({
+        serverSide: true,
+        responsive: true,
+        ajax: `/administrator/menus/${menuId}/permissions`,
+        columns: [{
+          data: 'id'
+        }, {
+          data: 'name'
+        }, {
+          data: 'created_at',
+          render: function(data) {
+            return moment(data).calendar()
+          }
+        }, {
+          data: 'updated_at',
+          render: function(data) {
+            return moment(data).calendar()
+          }
+        }, {
+          data: 'actions',
+          orderable: false,
+          searchable: false
+        }]
+      })
+    })
+
+    // Edit
+    $(document).on('click', `${modalSelector} .btn.btn-warning`, function(e) {
+      e.preventDefault()
+
+      const $btn = $(this)
+      const permissionId = $btn.data('permission-id')
+      const permissionName = $btn.data('permission-name').split('-')
+      const $modal = $(modalSelector)
+      const $form = $modal.find('form')
+      $form.data('action', 'update')
+      $form.find('input[name=id]').val(permissionId)
+      $form.find('input[name=name]').val(permissionName[permissionName.length - 1])
+      $form.find('button[type=submit]').html('Update')
+
+      $modal.find('.action-title').html('Edit Permission')
+    })
+
+    // Reset Form
+    $(document).on('click', `${modalSelector} .btn.btn-danger`, function(e) {
+      e.preventDefault()
+
+      const $btn = $(this)
+      const $modal = $(modalSelector)
+      const $form = $modal.find('form')
+      $form.data('action', 'create')
+      $form.find('input[name=id]').val(null)
+      $form.find('input[name=name]').val(null)
+      $form.find('button[type=submit]').html('Create')
+
+      $modal.find('.action-title').html('Add Permission')
+    })
+
+    // Submit
+    $(document).on('submit', `${modalSelector} form`, function(e) {
+      e.preventDefault()
+
+      const $form = $(this)
+      const menuId = $form.data('menu-id')
+      const actionType = $form.data('action')
+
+      const inputCSRF = $form.find('input[name=_token]')
+      const inputId = $form.find('input[name=id]').val()
+      const inputName = $form.find('input[name=name]').val()
+
+      const url = actionType === 'create' ?
+        `/administrator/menus/${menuId}/permissions` :
+        `/administrator/menus/${menuId}/permissions/${inputId}`
+
+      const $btnSpinner = new ButtonSpinner($form.find('button[type=submit]'))
+      $btnSpinner.show()
+
+      const payload = {
+        _token: CSRF_TOKEN,
+        name: inputName
+      }
+
+      if (actionType === 'update') {
+        payload['_method'] = 'PATCH'
+      }
+
+      $.post(url, payload)
+        .done(res => {
+          const $modal = $(modalSelector)
+          $modal.find('table').DataTable().ajax.reload(null, false)
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: res.message || 'Success to add permission!',
+          })
+
+          $form.find('.btn.btn-danger').trigger('click')
+        })
+        .fail(err => Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: err.responseJSON.message || 'Error while submitting data.',
+        }))
+        .always(() => $btnSpinner.hide())
+    })
+
   </script>
 @endpush
