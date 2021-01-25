@@ -37,7 +37,6 @@
 @endsection
 
 @push('script')
-  <script src="{{ asset('js/pages/menus.js') }}"></script>
   <script>
     $('#menu-datatable').DataTable({
       serverSide: true,
@@ -66,6 +65,31 @@
         orderable: false,
         searchable: false
       }]
+    })
+
+    $(document).on('api-modal.loaded', function(e, modal) {
+      const modalSelector = '#form-menu-modal'
+
+      if (modal !== modalSelector) return
+
+      const $iconInput = $('.form-group .form-control[name=icon]')
+      const $parentIdInput = $('.form-group .form-control[name=parent_id]')
+
+      function disableIcon() {
+        $iconInput.attr('disabled', 'disabled')
+        $iconInput.attr('required', null)
+      }
+
+      function enableIcon() {
+        $iconInput.attr('disabled', null)
+        $iconInput.attr('required', 'required')
+      }
+
+      $parentIdInput.val().length ? disableIcon() : enableIcon()
+
+      $parentIdInput.keyup(function(e) {
+        $parentIdInput.val().length ? disableIcon() : enableIcon()
+      })
     })
 
   </script>
