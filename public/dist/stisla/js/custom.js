@@ -44,9 +44,13 @@ function ButtonSpinner($btn) {
   this.show = () => {
     this.$btn.html(`<i class="fas fa-spinner fa-spin"></i>`)
     this.$btn.width(this.width)
+    this.$btn.attr('disabled', 'disabled')
   }
 
-  this.hide = () => this.$btn.html(this.content)
+  this.hide = () => {
+    this.$btn.html(this.content)
+    this.$btn.attr('disabled', null)
+  }
 }
 
 // Logout
@@ -118,7 +122,10 @@ $(document).on('click', '.btn-modal-trigger[data-modal]', function (e) {
     $modal.modal('show')
     $modal.on('hidden.bs.modal', function () {
       $modal.remove()
+      $(document).trigger('api-modal.removed', modalSelector)
     })
+
+    $(document).trigger('api-modal.loaded', modalSelector)
   })
     .fail(() => Swal.fire({
       icon: 'error',

@@ -32,8 +32,8 @@ class MenusTableSeeder extends Seeder
             [
                 'parent_id' => null,
                 'icon' => 'fas fa-users',
-                'name' => 'User Management',
-                'path' => '/administrator/user-management',
+                'name' => 'User Managements',
+                'path' => '/administrator/user-managements',
                 'has_sub_menus' => 'Y',
                 'sub_menus' => [
                     [
