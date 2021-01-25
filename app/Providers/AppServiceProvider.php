@@ -12,14 +12,15 @@ class AppServiceProvider extends ServiceProvider
     {
         $segment1 = request()->segment(1);
         $menus = collect([]);
+        $subMenus = collect([]);
 
         if ($segment1 === 'administrator') {
             $menus = Menu::whereNull('parent_id')
                             ->where('path', 'like', '/administrator/%')
                             ->get();
-            $subMenus = Menu::whereNotNull('parent_id')->get()->groupBy('parent_id');
+            $subMenus = Menu::whereNotNull('parent_id')->get();
 
-            $subMenus->each(function ($items, $parentId) use ($menus) {
+            $subMenus->groupBy('parent_id')->each(function ($items, $parentId) use ($menus) {
                 $targetMenu = $menus->firstWhere('id', $parentId);
                 if ($targetMenu) {
                     $targetMenu['sub_menus'] = $items;
@@ -27,7 +28,11 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
-        $activeMenu = $menus->firstWhere('path', request()->getPathInfo());
+        $currentPath = request()->getPathInfo();
+        $activeMenu = $menus->firstWhere('path', $currentPath);
+        if (!$activeMenu) {
+            $activeMenu = $subMenus->firstWhere('path', $currentPath);
+        }
 
         View::share('menus', $menus);
         View::share('activeMenu', $activeMenu);
