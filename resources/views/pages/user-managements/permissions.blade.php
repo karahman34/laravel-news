@@ -14,6 +14,8 @@
           <tr>
             <th>Id</th>
             <th>Name</th>
+            <th>Created At</th>
+            <th>Updated At</th>
           </tr>
         </thead>
       </table>
@@ -31,7 +33,17 @@
         data: 'id'
       }, {
         data: 'name'
-      }]
+      }, {
+        data: 'created_at',
+        render: function(data) {
+          return moment(data).calendar()
+        }
+      }, {
+        data: 'updated_at',
+        render: function(data) {
+          return moment(data).calendar()
+        }
+      }, ]
     })
 
   </script>

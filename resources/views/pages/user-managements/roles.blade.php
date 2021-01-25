@@ -23,6 +23,8 @@
           <tr>
             <th>Id</th>
             <th>Name</th>
+            <th>Created At</th>
+            <th>Updated At</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -41,6 +43,16 @@
         data: 'id'
       }, {
         data: 'name'
+      }, {
+        data: 'created_at',
+        render: function(data) {
+          return moment(data).calendar()
+        }
+      }, {
+        data: 'updated_at',
+        render: function(data) {
+          return moment(data).calendar()
+        }
       }, {
         data: 'actions',
         orderable: false,
@@ -103,15 +115,15 @@
       $tBody.html('')
       filteredPermissions.forEach((permission) => {
         $tBody.append(`
-                        <tr>
-                          <td>${permission}</td>
-                          <td>
-                            <div class="form-check d-flex align-items-center justify-content-center mb-1">
-                              <input type="checkbox" class="form-check-input" name="permissions[]" value="${permission}" ${selectedPermissions.some(p => p === permission) ? 'checked' : ''} />  
-                            </div>  
-                          </td>
-                        </tr>
-                      `)
+                              <tr>
+                                <td>${permission}</td>
+                                <td>
+                                  <div class="form-check d-flex align-items-center justify-content-center mb-1">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="${permission}" ${selectedPermissions.some(p => p === permission) ? 'checked' : ''} />  
+                                  </div>  
+                                </td>
+                              </tr>
+                            `)
       })
     })
 
