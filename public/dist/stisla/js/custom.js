@@ -26,9 +26,12 @@ function showValidationErrors(errorFields, $form) {
       $field.addClass('is-invalid')
 
       // Show error message
-      $field.closest('.form-group').append(`
-              <p class="text-danger mb-0">${errorFields[name]}</p>
-            `)
+      const $formGroup = $field.closest('.form-group')
+      errorFields[name].forEach((errMsg) => {
+        $formGroup.append(`
+          <p class="text-danger mb-0">${errMsg}</p>
+        `)
+      })
     }
   })
 }
