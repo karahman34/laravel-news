@@ -16,11 +16,12 @@ class CreateNewsTable extends Migration
         Schema::create('news', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->string('banner-image');
+            $table->string('banner_image');
             $table->string('title');
             $table->longText('content');
             $table->unsignedInteger('views')->default(0);
             $table->enum('is_headline', ['Y', 'N'])->default('N');
+            $table->enum('status', ['publish', 'draft', 'pending']);
             $table->timestamps();
         });
     }

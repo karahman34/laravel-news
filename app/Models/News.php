@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class News extends Model
 {
@@ -13,11 +15,12 @@ class News extends Model
 
     protected $fillable = [
         'user_id',
-        'banner-image',
+        'banner_image',
         'title',
         'content',
         'views',
-        'is_headline'
+        'is_headline',
+        'status',
     ];
 
     /**
@@ -38,5 +41,15 @@ class News extends Model
     public function tags()
     {
         return $this->belongsToMany(Tag::class);
+    }
+
+    /**
+     * Get banner image url.
+     *
+     * @return  string
+     */
+    public function getBannerImageUrl()
+    {
+        return Storage::url($this->banner_image);
     }
 }

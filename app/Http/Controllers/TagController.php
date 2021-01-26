@@ -35,6 +35,28 @@ class TagController extends Controller
     }
 
     /**
+     * Search tags.
+     *
+     * @param   Request  $request
+     *
+     * @return  \Illuminate\Http\Response
+     */
+    public function search(Request $request)
+    {
+        $request->validate([
+            'q' => 'required|string'
+        ]);
+        
+        $tags = Tag::where('name', 'like', '%'.$request->get('q').'%')->paginate();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Success to get tags data.',
+            'data' => $tags
+        ]);
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

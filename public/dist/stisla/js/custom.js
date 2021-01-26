@@ -10,18 +10,17 @@
 const CSRF_TOKEN = document.querySelector('meta[name=csrf-token]').getAttribute('content')
 
 function removeValidationErrors($form) {
-  $form.find('.form-group .form-control').removeClass('is-valid')
-  $form.find('.form-group .form-control').removeClass('is-invalid')
+  $form.find('.form-group .is-invalid').removeClass('is-invalid')
   $form.find('.form-group .text-danger').remove()
 }
 
 function showValidationErrors(errorFields, $form) {
   const errorFieldsName = Object.keys(errorFields)
-  const $fields = $form.find('.form-group input')
+  const $fields = $form.find('.form-group input, .form-group select, .form-group textarea')
 
   $fields.each(function (i) {
     const $field = $(this)
-    const name = $field.attr('name')
+    const name = $field.attr('id')
     if (errorFieldsName.includes(name)) {
       // Set error field
       $field.addClass('is-invalid')
@@ -30,8 +29,6 @@ function showValidationErrors(errorFields, $form) {
       $field.closest('.form-group').append(`
               <p class="text-danger mb-0">${errorFields[name]}</p>
             `)
-    } else {
-      $field.addClass('is-valid')
     }
   })
 }
@@ -191,6 +188,9 @@ $(document).on('submit', 'form.need-ajax', function (e) {
         title: 'Success!',
         text: res.message || 'Action success!',
       })
+
+      // Emit event on document
+      $(document).trigger('form-ajax.success', [res, $form])
     },
     error: err => {
       const errCode = err.status
@@ -206,6 +206,9 @@ $(document).on('submit', 'form.need-ajax', function (e) {
           text: 'Error while submitting data.',
         })
       }
+
+      // Emit event on document
+      $(document).trigger('form-ajax.error', [err, $form])
     }
   }
 
@@ -222,5 +225,11 @@ $(document).on('submit', 'form.need-ajax', function (e) {
   removeValidationErrors($form)
 
   $.ajax(options)
-    .always(() => $btnSpinner.hide())
+    .always(res => {
+      // Hide loading spinner
+      $btnSpinner.hide()
+
+      // Emit form event
+      $(document).trigger('form-ajax.submitted', [res, $form])
+    })
 })
