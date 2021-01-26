@@ -15,8 +15,9 @@ class DatabaseSeeder extends Seeder
     {
         \App\Models\User::factory(10)->create();
 
-        $this->call(SuperAdminSeeder::class);
         $this->call(MenusTableSeeder::class);
+        $this->call(RolesTableSeeder::class);
+        $this->call(SuperAdminSeeder::class);
         $this->call(TagsTableSeeder::class);
     }
 }

@@ -23,10 +23,6 @@ class SuperAdminSeeder extends Seeder
             'remember_token' => Str::random(10),
         ]);
 
-        $role = Role::create([
-            'name' => 'super admin'
-        ]);
-
-        $user->assignRole($role->name);
+        $user->assignRole('super admin');
     }
 }

@@ -24,4 +24,5 @@ Route::prefix('/administrator')->name('administrator.')->group(function () {
     require __DIR__.'/administrator/user-managements.php';
     require __DIR__.'/administrator/tags.php';
     require __DIR__.'/administrator/news.php';
+    require __DIR__.'/administrator/users.php';
 });

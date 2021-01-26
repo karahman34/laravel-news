@@ -67,6 +67,14 @@ class MenusTableSeeder extends Seeder
             [
                 'parent_id' => null,
                 'icon' => 'fas fa-users',
+                'name' => 'users',
+                'path' => '/administrator/users',
+                'has_sub_menus' => 'N',
+                'permissions' => ['users-create', 'users-update', 'users-delete', 'users-view'],
+            ],
+            [
+                'parent_id' => null,
+                'icon' => 'fas fa-users',
                 'name' => 'User Managements',
                 'path' => '/administrator/user-managements',
                 'has_sub_menus' => 'Y',
