@@ -1,5 +1,5 @@
 <div class="modal fade" id="sync-user-roles-modal" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Sync Roles</h5>
@@ -7,13 +7,11 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body pb-0">
         {{-- The Form --}}
-        <form action="{{ route('administrator.users.sync_roles', ['user' => $user]) }}" method="POST"
-          class="need-ajax has-modal">
+        <form id="sync-user-roles-form" action="{{ route('administrator.users.sync_roles', ['user' => $user]) }}"
+          method="POST" class="need-ajax has-modal">
           @csrf
-
-          <div id="store" class="d-none" data-user-roles="{{ $userRoles }}"></div>
 
           {{-- Search --}}
           <div class="form-group mb-1">
@@ -44,10 +42,11 @@
       @endforeach
       </tbody>
       </table>
-
-      {{-- Actions --}}
-      @include('components.modal-actions', ['action' => 'create'])
       </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-primary btn-submit-alt">Sync</button>
     </div>
   </div>
 </div>

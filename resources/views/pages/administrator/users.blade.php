@@ -73,7 +73,8 @@
     })
 
     const modalSelector = '#sync-user-roles-modal'
-    let userRoles = []
+    const formId = 'sync-user-roles-form'
+    let $btnSpinner = null
     let roles = []
     let selectedRoles = []
 
@@ -82,12 +83,8 @@
       if (modal !== modalSelector) return
 
       const $modal = $(this)
-      const $store = $modal.find('#store')
       const $rolesChecked = $modal.find('input[type=checkbox]:checked')
       const $rolesCheckbox = $modal.find('input[type=checkbox]')
-
-      // Set user roles
-      userRoles = Array.from($store.data('user-roles')).map(ur => ur.name)
 
       // Set roles list
       $rolesCheckbox.each(function() {
@@ -99,24 +96,44 @@
         const $el = $(this)
         selectedRoles.push($el.val())
       })
-
-      // Listen checkbox change
-      $rolesCheckbox.change(function() {
-        const $el = $(this)
-        const val = $el.val()
-
-        selectedRoles.indexOf(val) === -1 ?
-          selectedRoles.push(val) :
-          selectedRoles.splice(selectedRoles.indexOf(val), 1)
-      })
     })
 
     // Reset variables on modal close
     $(document).on('api-modal.removed', function(e, modal) {
       if (modal === modalSelector) {
-        userRoles = []
+        $btnSpinner = null
         roles = []
         selectedRoles = []
+      }
+    })
+
+    // Listen checkbox change
+    $(document).on('change', `${modalSelector} input[type=checkbox]`, function(e) {
+      const $el = $(this)
+      const val = $el.val()
+
+      selectedRoles.indexOf(val) === -1 ?
+        selectedRoles.push(val) :
+        selectedRoles.splice(selectedRoles.indexOf(val), 1)
+    })
+
+    // Click on sync button / submit
+    $(document).on('click', `${modalSelector} .btn-submit-alt`, function(e) {
+      e.preventDefault()
+
+      // Show loading spinner
+      $btnSpinner = new ButtonSpinner($(this))
+      $btnSpinner.show()
+
+      // Trigger form submit
+      const $form = $(`${modalSelector} #${formId}`)
+      $form.trigger('submit')
+    })
+
+    // Form was submitted.
+    $(document).on('form-ajax.submitted', function(e, res, $form) {
+      if ($form.attr('id') === formId) {
+        $btnSpinner.hide()
       }
     })
 
@@ -133,22 +150,22 @@
 
       if (!filteredRoles.length) {
         $tBody.append(`
-                      <tr>
-                        <td colspan="2" class="text-center">Roles not found.</td>  
-                      </tr>
-                    `)
+                    <tr>
+                      <td colspan="2" class="text-center">Roles not found.</td>  
+                    </tr>
+                  `)
       } else {
         filteredRoles.forEach((role) => {
           $tBody.append(`
-                        <tr>
-                          <td>${role}</td>
-                          <td>
-                            <div class="form-check d-flex align-items-center justify-content-center mb-1">
-                              <input type="checkbox" class="form-check-input" name="roles[]" value="${role}" ${selectedRoles.some(p => p === role) ? 'checked' : ''} />  
-                            </div>  
-                          </td>
-                        </tr>
-                      `)
+                    <tr>
+                      <td>${role}</td>
+                      <td>
+                        <div class="form-check d-flex align-items-center justify-content-center mb-1">
+                          <input type="checkbox" class="form-check-input" name="roles[]" value="${role}" ${selectedRoles.some(r => r === role) ? 'checked' : ''} />  
+                        </div>  
+                      </td>
+                    </tr>
+                  `)
         })
       }
     })

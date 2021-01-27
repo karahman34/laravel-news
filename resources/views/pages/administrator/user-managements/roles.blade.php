@@ -61,10 +61,13 @@
     })
 
     const modalSelector = '#role-permissions-modal'
+    const formId = 'sync-role-permissions-form'
+    let $btnSpinner = null
     let rolePermissions = []
     let permissions = []
     let selectedPermissions = []
 
+    // Modal loaded
     $(document).on('api-modal.loaded', function(e, modal) {
       if (modal !== modalSelector) return
 
@@ -86,22 +89,46 @@
         const $el = $(this)
         selectedPermissions.push($el.val())
       })
+    })
 
-      // Listen checkbox change
-      $permissionCheckbox.change(function() {
-        const $el = $(this)
-        const val = $el.val()
-
-        selectedPermissions.indexOf(val) === -1 ?
-          selectedPermissions.push(val) :
-          selectedPermissions.splice(selectedPermissions.indexOf(val), 1)
-      })
-
-      $modal.on('hidden.bs.modal', function() {
+    // Modal removed
+    $(document).on('api-modal.removed', function(e, modal) {
+      if (modal === modalSelector) {
+        $btnSpinner = null
         rolePermissions = []
         permissions = []
         selectedPermissions = []
-      })
+      }
+    })
+
+    // Checkbox change
+    $(document).on('change', `${modalSelector} input[type=checkbox]`, function() {
+      const $el = $(this)
+      const val = $el.val()
+
+      selectedPermissions.indexOf(val) === -1 ?
+        selectedPermissions.push(val) :
+        selectedPermissions.splice(selectedPermissions.indexOf(val), 1)
+    })
+
+    // Click on sync button / submit
+    $(document).on('click', `${modalSelector} .btn-submit-alt`, function(e) {
+      e.preventDefault()
+
+      // Show spinner
+      $btnSpinner = new ButtonSpinner($(this))
+      $btnSpinner.show()
+
+      // Trigger form submit
+      const $form = $(`${modalSelector} #${formId}`)
+      $form.trigger('submit')
+    })
+
+    // Form was submitted.
+    $(document).on('form-ajax.submitted', function(e, res, $form) {
+      if ($form.attr('id') === formId) {
+        $btnSpinner.hide()
+      }
     })
 
     // Listen search input
@@ -112,19 +139,30 @@
       const $tBody = $modal.find('table tbody')
       const q = $(this).val()
       const filteredPermissions = !q.length ? permissions : permissions.filter(permission => permission.includes(q))
+
+      // Reset tbody
       $tBody.html('')
-      filteredPermissions.forEach((permission) => {
+
+      if (!filteredPermissions.length) {
         $tBody.append(`
-                              <tr>
-                                <td>${permission}</td>
-                                <td>
-                                  <div class="form-check d-flex align-items-center justify-content-center mb-1">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="${permission}" ${selectedPermissions.some(p => p === permission) ? 'checked' : ''} />  
-                                  </div>  
-                                </td>
-                              </tr>
-                            `)
-      })
+                  <tr>
+                    <td colspan="2">Permissions not found.</td>
+                  </tr>
+                `)
+      } else {
+        filteredPermissions.forEach((permission) => {
+          $tBody.append(`
+                          <tr>
+                            <td>${permission}</td>
+                            <td>
+                              <div class="form-check d-flex align-items-center justify-content-center mb-1">
+                                <input type="checkbox" class="form-check-input" name="permissions[]" value="${permission}" ${selectedPermissions.some(p => p === permission) ? 'checked' : ''} />  
+                              </div>  
+                            </td>
+                          </tr>
+                        `)
+        })
+      }
     })
 
   </script>

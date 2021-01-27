@@ -1,16 +1,17 @@
 <div class="modal fade" id="role-permissions-modal" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Sync Permissions</h5>
+        <h5 class="modal-title">Sync {{ ucwords($role->name) }} Permissions</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body pb-0">
         {{-- The Form --}}
-        <form action="{{ route('administrator.user-managements.roles.sync_permissions', ['role' => $role]) }}"
-          method="POST" class="need-ajax has-modal">
+        <form id="sync-role-permissions-form"
+          action="{{ route('administrator.user-managements.roles.sync_permissions', ['role' => $role]) }}" method="POST"
+          class="need-ajax has-modal">
           @csrf
 
           <div id="store" class="d-none" data-role-permissions="{{ $rolePermissions }}"></div>
@@ -44,15 +45,11 @@
       @endforeach
       </tbody>
       </table>
-
-      {{-- Actions --}}
-      <div class="d-flex justify-content-end">
-        {{-- Close --}}
-        <button class="btn btn-light mr-3" data-dismiss="modal">Close</button>
-        {{-- Submit --}}
-        <button type="submit" class="btn btn-primary">Sync</button>
-      </div>
       </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-primary btn-submit-alt">Sync</button>
     </div>
   </div>
 </div>
