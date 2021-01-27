@@ -20,7 +20,13 @@ class MenusTableSeeder extends Seeder
         foreach ($subMenus as $subMenu) {
             $subMenu['parent_id'] = $parentMenu->id;
             $subMenu['path'] = $parentMenu->path . $subMenu['path'];
+
             Menu::create(collect($subMenu)->except('permissions')->toArray());
+
+            // Create permissions.
+            if (isset($subMenu['permissions'])) {
+                $this->createPermissions($subMenu['permissions']);
+            }
         }
     }
 
@@ -46,7 +52,7 @@ class MenusTableSeeder extends Seeder
                 'name' => 'menus',
                 'path' => '/administrator/menus',
                 'has_sub_menus' => 'N',
-                'permissions' => ['menus-create', 'menus-update', 'menus-delete', 'menus-view'],
+                'permissions' => ['menus-create', 'menus-update', 'menus-delete', 'menus-view', 'menus-create_permissions'],
             ],
             [
                 'parent_id' => null,
@@ -70,7 +76,7 @@ class MenusTableSeeder extends Seeder
                 'name' => 'users',
                 'path' => '/administrator/users',
                 'has_sub_menus' => 'N',
-                'permissions' => ['users-create', 'users-update', 'users-delete', 'users-view'],
+                'permissions' => ['users-create', 'users-update', 'users-delete', 'users-view', 'users-sync_roles'],
             ],
             [
                 'parent_id' => null,
@@ -83,7 +89,7 @@ class MenusTableSeeder extends Seeder
                         'name' => 'roles',
                         'path' => '/roles',
                         'has_sub_menus' => 'N',
-                        'permissions' => ['roles-create', 'roles-update', 'roles-delete', 'roles-view'],
+                        'permissions' => ['roles-create', 'roles-update', 'roles-delete', 'roles-view', 'roles-sync_permissions'],
                     ],
                     [
                         'name' => 'permissions',
