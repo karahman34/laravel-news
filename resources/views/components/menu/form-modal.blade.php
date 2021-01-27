@@ -80,12 +80,8 @@ $btnType = $action === 'create' ? 'btn-primary' : 'btn-warning';
             </select>
           </div>
 
-          <div class="d-flex justify-content-end">
-            {{-- Close --}}
-            <button class="btn btn-light mr-3" data-dismiss="modal">Close</button>
-            {{-- Submit --}}
-            <button type="submit" class="btn {{ $btnType }}">{{ ucfirst($action) }}</button>
-          </div>
+          {{-- Actions --}}
+          @include('components.modal-actions', ['action' => $action])
         </form>
       </div>
     </div>
