@@ -1,13 +1,13 @@
 <div class="main-sidebar">
   <aside id="sidebar-wrapper">
     <div class="sidebar-brand">
-      <a href="index.html">Stisla</a>
+      <a href="index.html">{{ env('APP_NAME') }}</a>
     </div>
     <div class="sidebar-brand sidebar-brand-sm">
       <a href="index.html">St</a>
     </div>
     <ul class="sidebar-menu">
-      <li class="menu-header">Dashboard</li>
+      <li class="menu-header">General</li>
 
       {{-- List of Menus --}}
       @foreach ($menus as $menu)
