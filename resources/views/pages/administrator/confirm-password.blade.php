@@ -13,7 +13,7 @@
         </div>
 
         <div class="card-body">
-          <form method="POST" action="{{ route('password.confirm') }}" class="needs-validation" novalidate="">
+          <form method="POST" action="{{ route('administrator.password.confirm') }}">
             @csrf
 
             <div class="form-group">
