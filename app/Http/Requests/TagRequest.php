@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Tag;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TagRequest extends FormRequest
@@ -28,7 +29,11 @@ class TagRequest extends FormRequest
         ];
 
         if ($this->tag) {
+            $this->authorize('update', $this->tag);
+
             $rules['name'] .= ',' . $this->tag->id;
+        } else {
+            $this->authorize('create', Tag::class);
         }
 
         return $rules;

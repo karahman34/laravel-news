@@ -17,6 +17,8 @@ class PermissionController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Permission::class);
+
         if (!$request->wantsJson()) {
             return view('pages.administrator.user-managements.permissions', [
                 'title' => 'Permissions',

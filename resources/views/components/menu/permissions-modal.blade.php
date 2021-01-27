@@ -9,28 +9,30 @@
       </div>
       <div class="modal-body">
         {{-- Form Block --}}
-        <div class="mb-3 form-block">
-          <h6 class="action-title">Add Permission</h6>
+        @can('permissions-create')
+          <div class="mb-3 form-block">
+            <h6 class="action-title">Add Permission</h6>
 
-          {{-- The Form --}}
-          <form data-action="create" data-menu-id="{{ $menu->id }}">
-            @csrf
+            {{-- The Form --}}
+            <form data-action="create" data-menu-id="{{ $menu->id }}">
+              @csrf
 
-            <input type="hidden" name="id">
+              <input type="hidden" name="id">
 
-            {{-- Name --}}
-            <div class="form-group mb-2">
-              <label for="name">Action Name</label>
-              <input type="text" class="form-control" name="name" placeholder="Name" required>
-            </div>
+              {{-- Name --}}
+              <div class="form-group mb-2">
+                <label for="name">Action Name</label>
+                <input type="text" class="form-control" name="name" placeholder="Name" required>
+              </div>
 
-            {{-- Actions --}}
-            <div class="d-flex justify-content-end my-1">
-              <button class="btn btn-danger mr-2">Reset</button>
-              <button type="submit" class="btn btn-primary">Create</button>
-            </div>
-          </form>
-        </div>
+              {{-- Actions --}}
+              <div class="d-flex justify-content-end my-1">
+                <button class="btn btn-danger mr-2">Reset</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+              </div>
+            </form>
+          </div>
+        @endcan
 
         {{-- Table --}}
         <table id="menu-permissions-datatable" class="table table-striped has-actions">

@@ -9,11 +9,13 @@
 
       <div class="d-flex justify-content-end">
         {{-- Create --}}
-        <a href="{{ route('administrator.user-managements.roles.create') }}" class="btn btn-primary btn-modal-trigger"
-          data-modal="#form-role-modal">
-          <i class="fas fa-plus mr-1"></i>
-          Create
-        </a>
+        @can('roles-create')
+          <a href="{{ route('administrator.user-managements.roles.create') }}" class="btn btn-primary btn-modal-trigger"
+            data-modal="#form-role-modal">
+            <i class="fas fa-plus mr-1"></i>
+            Create
+          </a>
+        @endcan
       </div>
     </div>
 
@@ -56,7 +58,14 @@
       }, {
         data: 'actions',
         orderable: false,
-        searchable: false
+        searchable: false,
+        render: function(data) {
+          if (!data.length) {
+            return `<span class="text-muted font-italic">No Actions</span>`
+          }
+
+          return data
+        }
       }]
     })
 
@@ -66,6 +75,19 @@
     let rolePermissions = []
     let permissions = []
     let selectedPermissions = []
+
+    function appendCheckBox($tBody, permission, selectedPermissions) {
+      $tBody.append(`
+                    <tr>
+                      <td>${permission}</td>
+                      <td>
+                        <div class="form-check d-flex align-items-center justify-content-center mb-1">
+                          <input type="checkbox" class="form-check-input" name="permissions[]" value="${permission}" ${selectedPermissions.some(p => p === permission) ? 'checked' : ''} />  
+                        </div>  
+                      </td>
+                    </tr>
+                  `)
+    }
 
     // Modal loaded
     $(document).on('api-modal.loaded', function(e, modal) {
@@ -115,9 +137,17 @@
     $(document).on('click', `${modalSelector} .btn-submit-alt`, function(e) {
       e.preventDefault()
 
+      const $tBody = $(`${modalSelector} table tbody`)
+
       // Show spinner
       $btnSpinner = new ButtonSpinner($(this))
       $btnSpinner.show()
+
+      // Reset tbody
+      $tBody.html('')
+
+      // Set the permissions
+      permissions.forEach((permission) => appendCheckBox($tBody, permission, selectedPermissions))
 
       // Trigger form submit
       const $form = $(`${modalSelector} #${formId}`)
@@ -145,23 +175,12 @@
 
       if (!filteredPermissions.length) {
         $tBody.append(`
-                  <tr>
-                    <td colspan="2">Permissions not found.</td>
-                  </tr>
-                `)
+                      <tr>
+                        <td colspan="2">Permissions not found.</td>
+                      </tr>
+                    `)
       } else {
-        filteredPermissions.forEach((permission) => {
-          $tBody.append(`
-                          <tr>
-                            <td>${permission}</td>
-                            <td>
-                              <div class="form-check d-flex align-items-center justify-content-center mb-1">
-                                <input type="checkbox" class="form-check-input" name="permissions[]" value="${permission}" ${selectedPermissions.some(p => p === permission) ? 'checked' : ''} />  
-                              </div>  
-                            </td>
-                          </tr>
-                        `)
-        })
+        filteredPermissions.forEach((permission) => appendCheckBox($tBody, permission, selectedPermissions))
       }
     })
 

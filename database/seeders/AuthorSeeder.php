@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class AuthorSeeder extends Seeder
 {
@@ -15,12 +16,21 @@ class AuthorSeeder extends Seeder
      */
     public function run()
     {
-        $author = User::create([
+        $user = User::create([
             'email' => 'author@example.com',
             'name' => 'author',
             'password' => Hash::make('password')
         ]);
 
-        $author->assignRole('author');
+        $role = Role::where('name', 'author')->first();
+
+        $permissions = [
+            'news-create', 'news-update', 'news-delete', 'news-view',
+            'tags-create', 'tags-update', 'tags-delete', 'tags-view'
+        ];
+        
+        $role->syncPermissions($permissions);
+
+        $user->assignRole($role->name);
     }
 }

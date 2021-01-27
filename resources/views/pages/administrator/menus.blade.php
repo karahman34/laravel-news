@@ -10,11 +10,13 @@
 
       <div class="d-flex justify-content-end">
         {{-- Create --}}
-        <a href="{{ route('administrator.menus.create') }}" class="btn btn-primary btn-modal-trigger"
-          data-modal="#form-menu-modal">
-          <i class="fas fa-plus mr-1"></i>
-          Create
-        </a>
+        @can('menus-create')
+          <a href="{{ route('administrator.menus.create') }}" class="btn btn-primary btn-modal-trigger"
+            data-modal="#form-menu-modal">
+            <i class="fas fa-plus mr-1"></i>
+            Create
+          </a>
+        @endcan
       </div>
     </div>
 
@@ -63,7 +65,14 @@
       }, {
         data: 'actions',
         orderable: false,
-        searchable: false
+        searchable: false,
+        render: function(data) {
+          if (!data.length) {
+            return `<span class="text-muted font-italic">No Actions</span>`
+          }
+
+          return data
+        }
       }]
     })
 
@@ -123,7 +132,14 @@
         }, {
           data: 'actions',
           orderable: false,
-          searchable: false
+          searchable: false,
+          render: function(data) {
+            if (!data.length) {
+              return `<span class="text-muted font-italic">No Actions</span>`
+            }
+
+            return data
+          }
         }]
       })
     })

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Spatie\Permission\Models\Permission;
 
 class MenuPermissionRequest extends FormRequest
 {
@@ -23,8 +24,15 @@ class MenuPermissionRequest extends FormRequest
      */
     public function rules()
     {
+        if (strtolower(request()->method()) === 'post') {
+            $this->authorize('create', Permission::class);
+        } else {
+            $this->authorize('update', $this->permission);
+        }
+        
+
         return [
-            'name' => 'required|string|max:255'
+            'name' => 'required|string|max:255|regex:/^[_a-zA-Z]+$/'
         ];
     }
 }

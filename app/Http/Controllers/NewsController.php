@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NewsRequest;
 use App\Models\News;
+use App\Policies\NewsPolicy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -39,6 +40,8 @@ class NewsController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', News::class);
+
         if (!$request->wantsJson()) {
             return view('pages.administrator.news', [
                 'title' => 'News'
@@ -49,11 +52,21 @@ class NewsController extends Controller
         $news->select('id', 'user_id', 'title', 'banner_image', 'views', 'is_headline', 'status', 'created_at', 'updated_at')
                 ->with('author:id,name,email');
 
+        $auth = Auth::user();
+        $newsPolicy = NewsPolicy::static();
+
         return DataTables::of($news)
-                            ->addColumn('actions', function (News $news) {
-                                $editButton = '<a href="'.route('administrator.news.edit', ['news' => $news->id]).'" class="btn btn-warning btn-modal-trigger" data-modal="#news-form-modal"><i class="fas fa-edit"></i></a>';
+                            ->addColumn('actions', function (News $news) use ($auth, $newsPolicy) {
+                                $editButton = '';
+                                $deleteButton = '';
+
+                                if ($newsPolicy->update($auth, $news)) {
+                                    $editButton = '<a href="'.route('administrator.news.edit', ['news' => $news->id]).'" class="btn btn-warning btn-modal-trigger" data-modal="#news-form-modal"><i class="fas fa-edit"></i></a>';
+                                }
                                 
-                                $deleteButton = '<a href="'.route('administrator.news.destroy', ['news' => $news->id]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#news-datatable" data-item-name="'.$news->title.'"><i class="fas fa-trash"></i></a>';
+                                if ($newsPolicy->delete($auth, $news)) {
+                                    $deleteButton = '<a href="'.route('administrator.news.destroy', ['news' => $news->id]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#news-datatable" data-item-name="'.$news->title.'"><i class="fas fa-trash"></i></a>';
+                                }
 
                                 return $editButton . $deleteButton;
                             })
@@ -68,6 +81,8 @@ class NewsController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', News::class);
+
         return view('components.news.form-modal');
     }
 
@@ -80,6 +95,8 @@ class NewsController extends Controller
      */
     public function uploadImage(Request $request)
     {
+        $this->authorize('create', News::class);
+
         $validator = Validator::make($request->all(), [
             'upload' => 'required|mimes:png,jpg,jpeg,gif',
         ]);
@@ -134,6 +151,8 @@ class NewsController extends Controller
      */
     public function edit(News $news)
     {
+        $this->authorize('update', $news);
+
         $news->load('tags');
 
         return view('components.news.form-modal', [
@@ -179,6 +198,8 @@ class NewsController extends Controller
      */
     public function destroy(News $news)
     {
+        $this->authorize('delete', $news);
+
         // Delete banner
         $this->deleteBannerImage($news->banner_image);
 

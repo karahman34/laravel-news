@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\News;
 use Illuminate\Foundation\Http\FormRequest;
 
 class NewsRequest extends FormRequest
@@ -34,7 +35,11 @@ class NewsRequest extends FormRequest
         ];
 
         if ($this->news) {
+            $this->authorize('update', $this->news);
+
             $rules['banner_image'] = str_replace('required', 'nullable', $rules['banner_image']);
+        } else {
+            $this->authorize('create', News::class);
         }
 
         return $rules;

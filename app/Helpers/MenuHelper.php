@@ -35,4 +35,17 @@ class MenuHelper
 
         return $path;
     }
+
+    /**
+     * Set mane permission name.
+     *
+     * @param   string  $name
+     * @param   string  $action
+     *
+     * @return  string
+     */
+    public static function setPermissionName(string $menuName, string $action)
+    {
+        return strtolower($menuName) . '-' . strtolower($action);
+    }
 }

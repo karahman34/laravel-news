@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Helpers\MenuHelper;
 use App\Http\Requests\MenuRequest;
 use App\Models\Menu;
+use App\Policies\MenuPolicy;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\DataTables;
 
@@ -20,23 +22,34 @@ class MenuController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$request->wantsJson()) {
-            $menus = config('global.menus');
-            $menu = $menus->firstWhere('path', $request->getPathInfo());
+        $this->authorize('viewAny', Menu::class);
 
+        if (!$request->wantsJson()) {
             return view('pages.administrator.menus', [
-                'title' => 'Menus',
-                'menu' => $menu,
+                'title' => 'Menus'
             ]);
         }
 
-        return DataTables::of(Menu::query())
-                            ->addColumn('actions', function ($menu) {
-                                $permissionsButton = '<a href="'.route('administrator.menus.permissions.index', ['menu' => $menu]).'" class="btn btn-info btn-modal-trigger" data-modal="#menu-permissions-modal"><i class="fas fa-lock"></i></a>';
+        $auth = Auth::user();
+        $menuPolicy = MenuPolicy::static();
 
-                                $editButton = '<a href="'.route('administrator.menus.edit', ['menu' => $menu]).'" class="btn btn-warning btn-modal-trigger" data-modal="#form-menu-modal"><i class="fas fa-edit"></i></a>';
+        return DataTables::of(Menu::query())
+                            ->addColumn('actions', function (Menu $menu) use ($auth, $menuPolicy) {
+                                $permissionsButton = '';
+                                $editButton = '';
+                                $deleteButton = '';
                                 
-                                $deleteButton = '<a href="'.route('administrator.menus.destroy', ['menu' => $menu]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#menu-datatable" data-item-name="'.$menu->name.'"><i class="fas fa-trash"></i></a>';
+                                if ($menuPolicy->syncPermissions($auth)) {
+                                    $permissionsButton = '<a href="'.route('administrator.menus.permissions.index', ['menu' => $menu]).'" class="btn btn-info btn-modal-trigger" data-modal="#menu-permissions-modal"><i class="fas fa-lock"></i></a>';
+                                }
+
+                                if ($menuPolicy->update($auth, $menu)) {
+                                    $editButton = '<a href="'.route('administrator.menus.edit', ['menu' => $menu]).'" class="btn btn-warning btn-modal-trigger" data-modal="#form-menu-modal"><i class="fas fa-edit"></i></a>';
+                                }
+                                
+                                if ($menuPolicy->delete($auth, $menu)) {
+                                    $deleteButton = '<a href="'.route('administrator.menus.destroy', ['menu' => $menu]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#menu-datatable" data-item-name="'.$menu->name.'"><i class="fas fa-trash"></i></a>';
+                                }
 
                                 return $permissionsButton . $editButton . $deleteButton;
                             })
@@ -51,6 +64,8 @@ class MenuController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Menu::class);
+
         return view('components.menu.form-modal');
     }
 
@@ -87,17 +102,6 @@ class MenuController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Menu  $menu
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Menu $menu)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Menu  $menu
@@ -105,6 +109,8 @@ class MenuController extends Controller
      */
     public function edit(Menu $menu)
     {
+        $this->authorize('update', $menu);
+
         return view('components.menu.form-modal', [
             'menu' => $menu
         ]);
@@ -136,7 +142,7 @@ class MenuController extends Controller
      *
      * @return  void
      */
-    public function updatePermissionNames(string $oldName, string $newName)
+    private function updatePermissionNames(string $oldName, string $newName)
     {
         $permissions = Permission::where('name', 'like', $oldName. '-%')->get();
         $permissions->each(function (Permission $permission) use ($newName) {
@@ -201,6 +207,8 @@ class MenuController extends Controller
      */
     public function destroy(Menu $menu)
     {
+        $this->authorize('delete', $menu);
+
         $menuName = $menu->name;
 
         // Delete menu model.

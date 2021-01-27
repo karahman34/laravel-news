@@ -52,7 +52,7 @@ class MenusTableSeeder extends Seeder
                 'name' => 'menus',
                 'path' => '/administrator/menus',
                 'has_sub_menus' => 'N',
-                'permissions' => ['menus-create', 'menus-update', 'menus-delete', 'menus-view', 'menus-create_permissions'],
+                'permissions' => ['menus-create', 'menus-update', 'menus-delete', 'menus-view', 'menus-sync_permissions'],
             ],
             [
                 'parent_id' => null,

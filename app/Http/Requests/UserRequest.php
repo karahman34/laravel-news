@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends FormRequest
@@ -23,6 +24,12 @@ class UserRequest extends FormRequest
      */
     public function rules()
     {
+        if (strtolower(request()->method()) === 'post') {
+            $this->authorize("create", User::class);
+        } else {
+            $this->authorize("update", $this->user);
+        }
+
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',

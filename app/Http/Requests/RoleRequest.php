@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Spatie\Permission\Models\Role;
 
 class RoleRequest extends FormRequest
 {
@@ -28,9 +29,13 @@ class RoleRequest extends FormRequest
         ];
 
         if ($this->role) {
-            $rules['name'] .= ',' . $this->role->id;
-        }
+            $this->authorize('update', $this->role);
 
+            $rules['name'] .= ',' . $this->role->id;
+        } else {
+            $this->authorize('create', Role::class);
+        }
+        
         return $rules;
     }
 }

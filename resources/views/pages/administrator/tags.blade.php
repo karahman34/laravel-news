@@ -10,11 +10,13 @@
 
       <div class="d-flex justify-content-end align-items-center">
         {{-- Create --}}
-        <a href="{{ route('administrator.tags.create') }}" class="btn btn-primary btn-modal-trigger"
-          data-modal="#form-tag-modal">
-          <i class="fas fa-plus mr-2"></i>
-          Create
-        </a>
+        @can('tags-create')
+          <a href="{{ route('administrator.tags.create') }}" class="btn btn-primary btn-modal-trigger"
+            data-modal="#form-tag-modal">
+            <i class="fas fa-plus mr-2"></i>
+            Create
+          </a>
+        @endcan
       </div>
     </div>
 
@@ -61,6 +63,13 @@
         data: 'actions',
         orderable: false,
         searchable: false,
+        render: function(data) {
+          if (!data.length) {
+            return `<span class="text-muted font-italic">No Actions</span>`
+          }
+
+          return data
+        }
       }, ]
     })
 

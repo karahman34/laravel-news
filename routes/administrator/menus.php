@@ -5,6 +5,7 @@ use App\Http\Controllers\MenuPermissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::resource('menus', MenuController::class)
+        ->except(['show'])
         ->middleware(['auth']);
 
 Route::prefix('menus')->name('menus.')->middleware(['auth'])->group(function () {

@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\MenuHelper;
 use App\Http\Requests\MenuPermissionRequest;
 use App\Models\Menu;
+use App\Policies\PermissionPolicy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\DataTables;
 
@@ -20,6 +23,8 @@ class MenuPermissionController extends Controller
      */
     public function index(Request $request, Menu $menu)
     {
+        $this->authorize('viewAny', Permission::class);
+
         if (!$request->wantsJson()) {
             return view('components.menu.permissions-modal', [
                 'menu' => $menu
@@ -28,12 +33,21 @@ class MenuPermissionController extends Controller
 
         $permissions = Permission::query();
         $permissions->where('name', 'like', $menu->name . '-%');
+        $auth = Auth::user();
+        $permissionPolicy = PermissionPolicy::static();
 
         return DataTables::of($permissions)
-                            ->addColumn('actions', function (Permission $permission) use ($menu) {
-                                $editButton = '<a href="#" class="btn btn-warning" data-permission-id="'.$permission->id.'" data-permission-name="'.$permission->name.'"><i class="fas fa-edit"></i></a>';
+                            ->addColumn('actions', function (Permission $permission) use ($menu, $auth, $permissionPolicy) {
+                                $editButton = '';
+                                $deleteButton = '';
                                 
-                                $deleteButton = '<a href="'.route('administrator.menus.permissions.destroy', ['menu' => $menu, 'permission' => $permission]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#menu-permissions-datatable" data-item-name="'.$permission->name.'"><i class="fas fa-trash"></i></a>';
+                                if ($permissionPolicy->update($auth, $permission)) {
+                                    $editButton = '<a href="#" class="btn btn-warning" data-permission-id="'.$permission->id.'" data-permission-name="'.$permission->name.'"><i class="fas fa-edit"></i></a>';
+                                }
+                                
+                                if ($permissionPolicy->delete($auth, $permission)) {
+                                    $deleteButton = '<a href="'.route('administrator.menus.permissions.destroy', ['menu' => $menu, 'permission' => $permission]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#menu-permissions-datatable" data-item-name="'.$permission->name.'"><i class="fas fa-trash"></i></a>';
+                                }
 
                                 return $editButton . $deleteButton;
                             })
@@ -50,7 +64,7 @@ class MenuPermissionController extends Controller
     public function store(MenuPermissionRequest $menuPermissionRequest, Menu $menu)
     {
         $permission = Permission::create([
-            'name' => $menu->name . '-' . $menuPermissionRequest->name
+            'name' => MenuHelper::setPermissionName($menu->name, $menuPermissionRequest->name),
         ]);
 
         return response()->json([
@@ -71,7 +85,7 @@ class MenuPermissionController extends Controller
     public function update(MenuPermissionRequest $menuPermissionRequest, Menu $menu, Permission $permission)
     {
         $permission->update([
-            'name' => $menu->name . '-' . $menuPermissionRequest->name
+            'name' => MenuHelper::setPermissionName($menu->name, $menuPermissionRequest->name),
         ]);
 
         return response()->json([
@@ -90,6 +104,8 @@ class MenuPermissionController extends Controller
      */
     public function destroy(Menu $menu, Permission $permission)
     {
+        $this->authorize('delete', $permission);
+        
         $permission->delete();
 
         return response()->json([

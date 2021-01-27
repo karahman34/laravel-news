@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\User;
+use App\Policies\UserPolicy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,27 +21,39 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', User::class);
+
         if (!$request->wantsJson()) {
             return view('pages.administrator.users', [
                 'title' => 'Users'
             ]);
         }
 
+        $auth = Auth::user();
         $user = User::query();
         $user->with(['roles:id,name']);
+        $userPolicy = UserPolicy::static();
 
         return DataTables::of(User::query())
                             ->addColumn('roles', function (User $user) {
-                                $roleNames = array_column($user->roles->toArray(), 'name');
-
-                                return implode(',', $roleNames);
+                                return $user->roles->implode('name', ',');
                             })
-                            ->addColumn('actions', function (User $user) {
-                                $syncRoles = '<a href="'.route('administrator.users.sync_roles', ['user' => $user]).'" class="btn btn-info btn-modal-trigger" data-modal="#sync-user-roles-modal" title="Sync Roles"><i class="fas fa-lock"></i></a>';
+                            ->addColumn('actions', function (User $user) use ($auth, $userPolicy) {
+                                $syncRoles = '';
+                                $editButton = '';
+                                $deleteButton = '';
 
-                                $editButton = '<a href="'.route('administrator.users.edit', ['user' => $user]).'" class="btn btn-warning btn-modal-trigger" data-modal="#user-form-modal"><i class="fas fa-edit"></i></a>';
+                                if ($userPolicy->syncRoles($auth)) {
+                                    $syncRoles = '<a href="'.route('administrator.users.sync_roles', ['user' => $user]).'" class="btn btn-info btn-modal-trigger" data-modal="#sync-user-roles-modal" title="Sync Roles"><i class="fas fa-lock"></i></a>';
+                                }
+
+                                if ($userPolicy->update($auth, $user)) {
+                                    $editButton = '<a href="'.route('administrator.users.edit', ['user' => $user]).'" class="btn btn-warning btn-modal-trigger" data-modal="#user-form-modal"><i class="fas fa-edit"></i></a>';
+                                }
                                 
-                                $deleteButton = '<a href="'.route('administrator.users.destroy', ['user' => $user]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#users-datatable" data-item-name="'.$user->name.'"><i class="fas fa-trash"></i></a>';
+                                if ($userPolicy->delete($auth, $user)) {
+                                    $deleteButton = '<a href="'.route('administrator.users.destroy', ['user' => $user]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#users-datatable" data-item-name="'.$user->name.'"><i class="fas fa-trash"></i></a>';
+                                }
 
                                 return $syncRoles . $editButton . $deleteButton;
                             })
@@ -55,6 +68,8 @@ class UserController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', User::class);
+
         return view('components.user.form-modal');
     }
 
@@ -87,6 +102,8 @@ class UserController extends Controller
      */
     public function syncRoles(Request $request, User $user)
     {
+        $this->authorize("syncRoles", User::class);
+
         if (strtolower($request->method()) === 'get') {
             return view('components.user.sync-roles-modal', [
                 'user' => $user,
@@ -121,6 +138,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        $this->authorize("update", $user);
+
         return view('components.user.form-modal', [
             'user' => $user
         ]);
@@ -158,6 +177,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        $this->authorize("delete", $user);
+
         $user->delete();
         
         return response()->json([

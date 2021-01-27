@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RoleRequest;
+use App\Policies\RolePolicy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\DataTables;
@@ -17,19 +19,34 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Role::class);
+
         if (!$request->wantsJson()) {
             return view('pages.administrator.user-managements.roles', [
                 'title' => 'Roles'
             ]);
         }
 
-        return DataTables::of(Role::query())
-                            ->addColumn('actions', function (Role $role) {
-                                $permissionsButton = '<a href="'.route('administrator.user-managements.roles.show', ['role' => $role]).'" class="btn btn-info btn-modal-trigger" data-modal="#role-permissions-modal"><i class="fas fa-lock"></i></a>';
+        $auth = Auth::user();
+        $rolePolicy = RolePolicy::static();
 
-                                $editButton = '<a href="'.route('administrator.user-managements.roles.edit', ['role' => $role]).'" class="btn btn-warning btn-modal-trigger" data-modal="#form-role-modal"><i class="fas fa-edit"></i></a>';
+        return DataTables::of(Role::query())
+                            ->addColumn('actions', function (Role $role) use ($auth, $rolePolicy) {
+                                $permissionsButton = '';
+                                $editButton = '';
+                                $deleteButton = '';
+
+                                if ($rolePolicy->syncPermissions($auth)) {
+                                    $permissionsButton = '<a href="'.route('administrator.user-managements.roles.show', ['role' => $role]).'" class="btn btn-info btn-modal-trigger" data-modal="#role-permissions-modal"><i class="fas fa-lock"></i></a>';
+                                }
+
+                                if ($rolePolicy->update($auth, $role)) {
+                                    $editButton = '<a href="'.route('administrator.user-managements.roles.edit', ['role' => $role]).'" class="btn btn-warning btn-modal-trigger" data-modal="#form-role-modal"><i class="fas fa-edit"></i></a>';
+                                }
                                 
-                                $deleteButton = '<a href="'.route('administrator.user-managements.roles.destroy', ['role' => $role]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#roles-datatable" data-item-name="'.$role->name.'"><i class="fas fa-trash"></i></a>';
+                                if ($rolePolicy->delete($auth, $role)) {
+                                    $deleteButton = '<a href="'.route('administrator.user-managements.roles.destroy', ['role' => $role]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#roles-datatable" data-item-name="'.$role->name.'"><i class="fas fa-trash"></i></a>';
+                                }
 
                                 return $permissionsButton . $editButton . $deleteButton;
                             })
@@ -44,6 +61,8 @@ class RoleController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Role::class);
+
         return view('components.role.form-modal');
     }
 
@@ -72,6 +91,8 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
+        $this->authorize('syncPermissions', Role::class);
+
         return view('components.role.permissions-modal', [
             'role' => $role,
             'rolePermissions' => $role->permissions,
@@ -89,6 +110,8 @@ class RoleController extends Controller
      */
     public function syncPermissions(Request $request, Role $role)
     {
+        $this->authorize('syncPermissions', Role::class);
+
         $payload = $request->validate([
             'permissions' => 'nullable|array',
             'permissions.*' => 'string|max:255',
@@ -115,6 +138,8 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
+        $this->authorize('update', $role);
+        
         return view('components.role.form-modal', [
             'role' => $role
         ]);
@@ -129,6 +154,8 @@ class RoleController extends Controller
      */
     public function update(RoleRequest $roleRequest, Role $role)
     {
+        $this->authorize('update', $role);
+
         $role->update($roleRequest->only('name'));
 
         return response()->json([
@@ -146,6 +173,8 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
+        $this->authorize('delete', $role);
+
         $role->delete();
 
         return response()->json([

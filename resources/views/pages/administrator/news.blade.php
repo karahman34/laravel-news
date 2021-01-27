@@ -9,12 +9,14 @@
       </h4>
 
       <div class="d-flex justify-content-end align-items-center">
-        {{-- Create --}}
-        <a href="{{ route('administrator.news.create') }}" class="btn btn-primary btn-modal-trigger"
-          data-modal="#news-form-modal">
-          <i class="fas fa-plus mr-2"></i>
-          Create
-        </a>
+        @can('news-create')
+          {{-- Create --}}
+          <a href="{{ route('administrator.news.create') }}" class="btn btn-primary btn-modal-trigger"
+            data-modal="#news-form-modal">
+            <i class="fas fa-plus mr-2"></i>
+            Create
+          </a>
+        @endcan
       </div>
     </div>
 
@@ -84,6 +86,13 @@
         data: 'actions',
         orderable: false,
         searchable: false,
+        render: function(data) {
+          if (!data.length) {
+            return `<span class="text-muted font-italic">No Actions</span>`
+          }
+
+          return data
+        }
       }, ]
     })
 

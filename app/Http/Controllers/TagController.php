@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TagRequest;
 use App\Models\Tag;
+use App\Policies\TagPolicy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 
 class TagController extends Controller
@@ -16,17 +18,29 @@ class TagController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Tag::class);
+
         if (!$request->wantsJson()) {
             return view('pages.administrator.tags', [
                 'title' => 'Tags'
             ]);
         }
 
+        $auth = Auth::user();
+        $tagPolicy = TagPolicy::static();
+
         return DataTables::of(Tag::query())
-                            ->addColumn('actions', function (Tag $tag) {
-                                $editButton = '<a href="'.route('administrator.tags.edit', ['tag' => $tag]).'" class="btn btn-warning btn-modal-trigger" data-modal="#form-tag-modal"><i class="fas fa-edit"></i></a>';
+                            ->addColumn('actions', function (Tag $tag) use ($auth, $tagPolicy) {
+                                $editButton = '';
+                                $deleteButton = '';
+
+                                if ($tagPolicy->update($auth, $tag)) {
+                                    $editButton = '<a href="'.route('administrator.tags.edit', ['tag' => $tag]).'" class="btn btn-warning btn-modal-trigger" data-modal="#form-tag-modal"><i class="fas fa-edit"></i></a>';
+                                }
                                 
-                                $deleteButton = '<a href="'.route('administrator.tags.destroy', ['tag' => $tag]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#tags-datatable" data-item-name="'.$tag->name.'"><i class="fas fa-trash"></i></a>';
+                                if ($tagPolicy->delete($auth, $tag)) {
+                                    $deleteButton = '<a href="'.route('administrator.tags.destroy', ['tag' => $tag]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#tags-datatable" data-item-name="'.$tag->name.'"><i class="fas fa-trash"></i></a>';
+                                }
 
                                 return $editButton . $deleteButton;
                             })
@@ -43,6 +57,8 @@ class TagController extends Controller
      */
     public function search(Request $request)
     {
+        $this->authorize('viewAny', Tag::class);
+
         $request->validate([
             'q' => 'required|string'
         ]);
@@ -63,6 +79,8 @@ class TagController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Tag::class);
+
         return view('components.tag.form-modal');
     }
 
@@ -105,6 +123,8 @@ class TagController extends Controller
      */
     public function edit(Tag $tag)
     {
+        $this->authorize('update', $tag);
+
         return view('components.tag.form-modal', [
             'tag' => $tag
         ]);
@@ -138,6 +158,8 @@ class TagController extends Controller
      */
     public function destroy(Tag $tag)
     {
+        $this->authorize('delete', $tag);
+
         $tag->delete();
 
         return response()->json([
