@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\MenuHelper;
 use App\Http\Requests\MenuRequest;
 use App\Models\Menu;
 use Illuminate\Http\JsonResponse;
@@ -11,8 +12,6 @@ use Yajra\DataTables\DataTables;
 
 class MenuController extends Controller
 {
-    private $menuPathPrefix = '/administrator';
-
     /**
      * Display a listing of the resource.
      *
@@ -56,34 +55,6 @@ class MenuController extends Controller
     }
 
     /**
-     * Format menu path.
-     *
-     * @param   string  $path
-     * @param   string|int  $parentId
-     *
-     * @return  string|JsonResponse
-     */
-    private function setMenuPath(string $path, $parentId)
-    {
-        if (is_numeric($parentId)) {
-            $parentMenu = Menu::select('id', 'path')->whereId($parentId)->first();
-
-            if (!$parentMenu) {
-                return response()->json([
-                    'ok' => false,
-                    'message' => 'Parent menu is invalid.',
-                ], 404);
-            }
-
-            $path = $parentMenu->path . $path;
-        } else {
-            $path = $this->menuPathPrefix . $path;
-        }
-
-        return $path;
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  MenuRequest  $menuRequest
@@ -100,7 +71,10 @@ class MenuController extends Controller
         ]);
 
         // Set menu path.
-        $payload['path'] = $this->setMenuPath($payload['path'], $payload['parent_id']);
+        $payload['path'] = MenuHelper::setMenuPath($payload['path'], $payload['parent_id']);
+        if (!is_string($payload['path'])) {
+            return $payload['path'];
+        }
 
         // Create menu model.
         $menu = Menu::create($payload);
@@ -193,7 +167,10 @@ class MenuController extends Controller
 
         // Set menu path.
         if (isset($menuRequest->path) && strlen($menuRequest->path) > 0) {
-            $payload['path'] = $this->setMenuPath($menuRequest->path, $payload['parent_id']);
+            $payload['path'] = MenuHelper::setMenuPath($menuRequest->path, $payload['parent_id']);
+            if (!is_string($payload['path'])) {
+                return $payload['path'];
+            }
         }
 
         // Update menu.

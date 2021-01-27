@@ -16,7 +16,7 @@
           <li @if (request()->getPathInfo() === $menu->path) class="active" @endif>
             <a class="nav-link" href="{{ $menu->path }}">
               <i class="{{ $menu->icon }}"></i>
-              <span>{{ ucwords($menu->name) }}</span>
+              <span>{{ ucwords(strtolower($menu->name)) }}</span>
             </a>
           </li>
         @else
@@ -25,7 +25,7 @@
             request()->getPathInfo())) active @endif">
             <a href="#" class="nav-link has-dropdown">
               <i class="{{ $menu->icon }}"></i>
-              <span>{{ $menu->name }}</span>
+              <span>{{ ucwords(strtolower($menu->name)) }}</span>
             </a>
 
             {{-- Sub Menus --}}
@@ -33,7 +33,7 @@
               @if (!is_null($menu->sub_menus) && $menu->sub_menus->count() > 0)
                 @foreach ($menu->sub_menus as $subMenu)
                   <li @if (request()->getPathInfo() === $subMenu->path) class="active" @endif>
-                    <a class="nav-link" href="{{ $subMenu->path }}">{{ ucwords($subMenu->name) }}</a>
+                    <a class="nav-link" href="{{ $subMenu->path }}">{{ ucwords(strtolower($subMenu->name)) }}</a>
                   </li>
                 @endforeach
               @endif

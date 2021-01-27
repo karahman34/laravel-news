@@ -206,7 +206,7 @@ $(document).on('submit', 'form.need-ajax', function (e) {
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: 'Error while submitting data.',
+          text: err?.responseJSON?.message || 'Error while submitting data.',
         })
       }
 

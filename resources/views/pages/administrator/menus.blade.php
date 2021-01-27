@@ -78,6 +78,7 @@
       function disableIcon() {
         $iconInput.attr('disabled', 'disabled')
         $iconInput.attr('required', null)
+        $iconInput.val('')
       }
 
       function enableIcon() {
