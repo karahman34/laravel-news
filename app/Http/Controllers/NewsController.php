@@ -40,7 +40,7 @@ class NewsController extends Controller
     public function index(Request $request)
     {
         if (!$request->wantsJson()) {
-            return view('pages.news', [
+            return view('pages.administrator.news', [
                 'title' => 'News'
             ]);
         }

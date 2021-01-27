@@ -25,7 +25,7 @@ class MenuController extends Controller
             $menus = config('global.menus');
             $menu = $menus->firstWhere('path', $request->getPathInfo());
 
-            return view('pages.menus', [
+            return view('pages.administrator.menus', [
                 'title' => 'Menus',
                 'menu' => $menu,
             ]);

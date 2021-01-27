@@ -18,7 +18,7 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         if (!$request->wantsJson()) {
-            return view('pages.user-managements.roles', [
+            return view('pages.administrator.user-managements.roles', [
                 'title' => 'Roles'
             ]);
         }

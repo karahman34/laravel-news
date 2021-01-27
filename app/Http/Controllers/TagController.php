@@ -17,7 +17,7 @@ class TagController extends Controller
     public function index(Request $request)
     {
         if (!$request->wantsJson()) {
-            return view('pages.tags', [
+            return view('pages.administrator.tags', [
                 'title' => 'Tags'
             ]);
         }
