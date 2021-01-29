@@ -70,7 +70,7 @@
 
       const windowWidth = window.innerWidth || document.documentElement.clientWidth
       const scrollY = window.scrollY + window.innerHeight
-      const stopAt = (sidebar.scrollHeight + navbar.scrollHeight + navbarTags.scrollHeight) + 50
+      const stopAt = sidebar.scrollHeight + navbar.scrollHeight + navbarTags.scrollHeight
       const sidebarTopPosition = window.innerHeight - sidebar.scrollHeight
 
       if (windowWidth < 768) {
