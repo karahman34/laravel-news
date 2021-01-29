@@ -11,19 +11,7 @@ class MenuPolicy
     use HandlesAuthorization;
 
     public $prefixPermission = 'menus';
-
-    /**
-     * Get static instance.
-     *
-     * @return self
-     */
-    public static function static()
-    {
-        $self = new self;
-
-        return $self;
-    }
-
+    
     /**
      * Determine whether the user can view any models.
      *

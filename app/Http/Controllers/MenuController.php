@@ -5,10 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\MenuHelper;
 use App\Http\Requests\MenuRequest;
 use App\Models\Menu;
-use App\Policies\MenuPolicy;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\DataTables;
 
@@ -30,24 +27,23 @@ class MenuController extends Controller
             ]);
         }
 
-        $auth = Auth::user();
-        $menuPolicy = MenuPolicy::static();
+        $auth = $request->user();
 
         return DataTables::of(Menu::query())
-                            ->addColumn('actions', function (Menu $menu) use ($auth, $menuPolicy) {
+                            ->addColumn('actions', function (Menu $menu) use ($auth) {
                                 $permissionsButton = '';
                                 $editButton = '';
                                 $deleteButton = '';
                                 
-                                if ($menuPolicy->syncPermissions($auth)) {
+                                if ($auth->can('syncPermissions', $menu)) {
                                     $permissionsButton = '<a href="'.route('administrator.menus.permissions.index', ['menu' => $menu]).'" class="btn btn-info btn-modal-trigger" data-modal="#menu-permissions-modal"><i class="fas fa-lock"></i></a>';
                                 }
 
-                                if ($menuPolicy->update($auth, $menu)) {
+                                if ($auth->can('update', $menu)) {
                                     $editButton = '<a href="'.route('administrator.menus.edit', ['menu' => $menu]).'" class="btn btn-warning btn-modal-trigger" data-modal="#form-menu-modal"><i class="fas fa-edit"></i></a>';
                                 }
                                 
-                                if ($menuPolicy->delete($auth, $menu)) {
+                                if ($auth->can('delete', $menu)) {
                                     $deleteButton = '<a href="'.route('administrator.menus.destroy', ['menu' => $menu]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#menu-datatable" data-item-name="'.$menu->name.'"><i class="fas fa-trash"></i></a>';
                                 }
 

@@ -12,17 +12,6 @@ class UserPolicy
     public $prefixPermission = 'users';
 
     /**
-     * Get static instance.
-     *
-     * @return $this
-     */
-    public static function static()
-    {
-        $self = new self;
-        return $self;
-    }
-
-    /**
      * Determine whether the user can view any models.
      *
      * @param  \App\Models\User  $user

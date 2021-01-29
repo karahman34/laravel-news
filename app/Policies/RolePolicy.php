@@ -13,18 +13,6 @@ class RolePolicy
     public $prefixPermission = 'roles';
 
     /**
-     * Get static instance.
-     *
-     * @return self
-     */
-    public static function static()
-    {
-        $self = new self;
-
-        return $self;
-    }
-
-    /**
      * Determine whether the user can view any models.
      *
      * @param  \App\Models\User  $user

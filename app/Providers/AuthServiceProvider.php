@@ -44,7 +44,7 @@ class AuthServiceProvider extends ServiceProvider
 
         // Defining Super Admin
         Gate::before(function ($user, $ability) {
-            return $user->hasRole('super admin') ? true : null;
+            return $user->isSuperAdmin() ? true : null;
         });
     }
 }

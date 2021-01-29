@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\MenuHelper;
 use App\Http\Requests\MenuPermissionRequest;
 use App\Models\Menu;
-use App\Policies\PermissionPolicy;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\DataTables;
 
@@ -33,19 +31,18 @@ class MenuPermissionController extends Controller
 
         $permissions = Permission::query();
         $permissions->where('name', 'like', $menu->name . '-%');
-        $auth = Auth::user();
-        $permissionPolicy = PermissionPolicy::static();
+        $auth = $request->user();
 
         return DataTables::of($permissions)
-                            ->addColumn('actions', function (Permission $permission) use ($menu, $auth, $permissionPolicy) {
+                            ->addColumn('actions', function (Permission $permission) use ($menu, $auth) {
                                 $editButton = '';
                                 $deleteButton = '';
                                 
-                                if ($permissionPolicy->update($auth, $permission)) {
+                                if ($auth->can('update', $permission)) {
                                     $editButton = '<a href="#" class="btn btn-warning" data-permission-id="'.$permission->id.'" data-permission-name="'.$permission->name.'"><i class="fas fa-edit"></i></a>';
                                 }
                                 
-                                if ($permissionPolicy->delete($auth, $permission)) {
+                                if ($auth->can('delete', $permission)) {
                                     $deleteButton = '<a href="'.route('administrator.menus.permissions.destroy', ['menu' => $menu, 'permission' => $permission]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#menu-permissions-datatable" data-item-name="'.$permission->name.'"><i class="fas fa-trash"></i></a>';
                                 }
 

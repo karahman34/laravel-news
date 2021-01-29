@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TagRequest;
 use App\Models\Tag;
-use App\Policies\TagPolicy;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 
 class TagController extends Controller
@@ -26,19 +24,18 @@ class TagController extends Controller
             ]);
         }
 
-        $auth = Auth::user();
-        $tagPolicy = TagPolicy::static();
+        $auth = $request->user();
 
         return DataTables::of(Tag::query())
-                            ->addColumn('actions', function (Tag $tag) use ($auth, $tagPolicy) {
+                            ->addColumn('actions', function (Tag $tag) use ($auth) {
                                 $editButton = '';
                                 $deleteButton = '';
 
-                                if ($tagPolicy->update($auth, $tag)) {
+                                if ($auth->can('update', $tag)) {
                                     $editButton = '<a href="'.route('administrator.tags.edit', ['tag' => $tag]).'" class="btn btn-warning btn-modal-trigger" data-modal="#form-tag-modal"><i class="fas fa-edit"></i></a>';
                                 }
                                 
-                                if ($tagPolicy->delete($auth, $tag)) {
+                                if ($auth->can('delete', $tag)) {
                                     $deleteButton = '<a href="'.route('administrator.tags.destroy', ['tag' => $tag]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#tags-datatable" data-item-name="'.$tag->name.'"><i class="fas fa-trash"></i></a>';
                                 }
 

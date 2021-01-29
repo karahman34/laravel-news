@@ -42,4 +42,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(News::class);
     }
+
+    /**
+     * Determine whether the user is super admin.
+     *
+     * @return  bool
+     */
+    public function isSuperAdmin()
+    {
+        return $this->hasRole('super admin');
+    }
 }

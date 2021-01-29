@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RoleRequest;
-use App\Policies\RolePolicy;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\DataTables;
@@ -27,24 +25,23 @@ class RoleController extends Controller
             ]);
         }
 
-        $auth = Auth::user();
-        $rolePolicy = RolePolicy::static();
+        $auth = $request->user();
 
         return DataTables::of(Role::query())
-                            ->addColumn('actions', function (Role $role) use ($auth, $rolePolicy) {
+                            ->addColumn('actions', function (Role $role) use ($auth) {
                                 $permissionsButton = '';
                                 $editButton = '';
                                 $deleteButton = '';
 
-                                if ($rolePolicy->syncPermissions($auth)) {
+                                if ($auth->can('syncPermissions', $role)) {
                                     $permissionsButton = '<a href="'.route('administrator.user-managements.roles.show', ['role' => $role]).'" class="btn btn-info btn-modal-trigger" data-modal="#role-permissions-modal"><i class="fas fa-lock"></i></a>';
                                 }
 
-                                if ($rolePolicy->update($auth, $role)) {
+                                if ($auth->can('update', $role)) {
                                     $editButton = '<a href="'.route('administrator.user-managements.roles.edit', ['role' => $role]).'" class="btn btn-warning btn-modal-trigger" data-modal="#form-role-modal"><i class="fas fa-edit"></i></a>';
                                 }
                                 
-                                if ($rolePolicy->delete($auth, $role)) {
+                                if ($auth->can('delete', $role)) {
                                     $deleteButton = '<a href="'.route('administrator.user-managements.roles.destroy', ['role' => $role]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#roles-datatable" data-item-name="'.$role->name.'"><i class="fas fa-trash"></i></a>';
                                 }
 

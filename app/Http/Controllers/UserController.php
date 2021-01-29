@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\User;
-use App\Policies\UserPolicy;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\DataTables;
@@ -29,29 +27,28 @@ class UserController extends Controller
             ]);
         }
 
-        $auth = Auth::user();
+        $auth = $request->user();
         $user = User::query();
         $user->with(['roles:id,name']);
-        $userPolicy = UserPolicy::static();
 
         return DataTables::of(User::query())
                             ->addColumn('roles', function (User $user) {
                                 return $user->roles->implode('name', ',');
                             })
-                            ->addColumn('actions', function (User $user) use ($auth, $userPolicy) {
+                            ->addColumn('actions', function (User $user) use ($auth) {
                                 $syncRoles = '';
                                 $editButton = '';
                                 $deleteButton = '';
 
-                                if ($userPolicy->syncRoles($auth)) {
+                                if ($auth->can('syncRoles', $user)) {
                                     $syncRoles = '<a href="'.route('administrator.users.sync_roles', ['user' => $user]).'" class="btn btn-info btn-modal-trigger" data-modal="#sync-user-roles-modal" title="Sync Roles"><i class="fas fa-lock"></i></a>';
                                 }
 
-                                if ($userPolicy->update($auth, $user)) {
+                                if ($auth->can('update', $user)) {
                                     $editButton = '<a href="'.route('administrator.users.edit', ['user' => $user]).'" class="btn btn-warning btn-modal-trigger" data-modal="#user-form-modal"><i class="fas fa-edit"></i></a>';
                                 }
                                 
-                                if ($userPolicy->delete($auth, $user)) {
+                                if ($auth->can('delete', $user)) {
                                     $deleteButton = '<a href="'.route('administrator.users.destroy', ['user' => $user]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#users-datatable" data-item-name="'.$user->name.'"><i class="fas fa-trash"></i></a>';
                                 }
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NewsRequest;
 use App\Models\News;
-use App\Policies\NewsPolicy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -50,21 +49,20 @@ class NewsController extends Controller
 
         $news = News::query();
         $news->select('id', 'user_id', 'title', 'banner_image', 'views', 'is_headline', 'status', 'created_at', 'updated_at')
-                ->with('author:id,name,email');
-
-        $auth = Auth::user();
-        $newsPolicy = NewsPolicy::static();
+        ->with('author:id,name,email');
+        
+        $auth = $request->user();
 
         return DataTables::of($news)
-                            ->addColumn('actions', function (News $news) use ($auth, $newsPolicy) {
+                            ->addColumn('actions', function (News $news) use ($auth) {
                                 $editButton = '';
                                 $deleteButton = '';
 
-                                if ($newsPolicy->update($auth, $news)) {
+                                if ($auth->can('update', $news)) {
                                     $editButton = '<a href="'.route('administrator.news.edit', ['news' => $news->id]).'" class="btn btn-warning btn-modal-trigger" data-modal="#news-form-modal"><i class="fas fa-edit"></i></a>';
                                 }
                                 
-                                if ($newsPolicy->delete($auth, $news)) {
+                                if ($auth->can('delete', $news)) {
                                     $deleteButton = '<a href="'.route('administrator.news.destroy', ['news' => $news->id]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#news-datatable" data-item-name="'.$news->title.'"><i class="fas fa-trash"></i></a>';
                                 }
 
