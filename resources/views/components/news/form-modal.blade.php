@@ -20,7 +20,7 @@ $btnType = $action === 'create' ? 'btn-primary' : 'btn-warning';
       <div class="modal-body pb-0">
         {{-- The Form --}}
         <form id="news-form" action="{{ $url }}" method="POST" enctype="multipart/form-data"
-          class="need-ajax has-datatable has-modal" data-datatable="#news-datatable">
+          class="need-ajax has-datatable has-modal" data-datatable="#news-datatable" @if ($action === 'update') data-stay-paging="1" @endif>
           @csrf @method($method)
 
           {{-- First Row --}}
