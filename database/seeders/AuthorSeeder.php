@@ -25,6 +25,7 @@ class AuthorSeeder extends Seeder
         $role = Role::where('name', 'author')->first();
 
         $permissions = [
+            'dashboard-view',
             'news-create', 'news-update', 'news-delete', 'news-view',
             'tags-create', 'tags-update', 'tags-delete', 'tags-view'
         ];

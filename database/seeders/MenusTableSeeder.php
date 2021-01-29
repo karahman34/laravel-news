@@ -44,7 +44,7 @@ class MenusTableSeeder extends Seeder
                 'name' => 'dashboard',
                 'path' => '/administrator/dashboard',
                 'has_sub_menus' => 'N',
-                'permissions' => [],
+                'permissions' => ['dashboard-view'],
             ],
             [
                 'parent_id' => null,
