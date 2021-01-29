@@ -128,7 +128,7 @@ class NewsController extends Controller
      */
     public function store(NewsRequest $newsRequest)
     {
-        $payload = $newsRequest->only(['title', 'content', 'is_headline', 'status']);
+        $payload = $newsRequest->only(['title', 'summary', 'content', 'is_headline', 'status']);
         $payload['user_id'] = Auth::id();
         $payload['banner_image'] = $newsRequest->file('banner_image')->store($this->news_banner_image_path);
 
@@ -169,7 +169,7 @@ class NewsController extends Controller
      */
     public function update(NewsRequest $newsRequest, News $news)
     {
-        $payload = $newsRequest->only(['title', 'content', 'is_headline', 'status']);
+        $payload = $newsRequest->only(['title', 'summary', 'content', 'is_headline', 'status']);
 
         if ($newsRequest->hasFile('banner_image')) {
             // Delete old banner

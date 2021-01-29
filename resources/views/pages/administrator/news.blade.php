@@ -62,8 +62,6 @@
         data: 'id'
       }, {
         data: 'author.name',
-        orderable: false,
-        searchable: false,
       }, {
         data: 'title'
       }, {

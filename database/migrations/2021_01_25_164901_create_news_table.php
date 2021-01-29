@@ -18,6 +18,7 @@ class CreateNewsTable extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('banner_image');
             $table->string('title');
+            $table->string('summary', 150);
             $table->longText('content');
             $table->unsignedInteger('views')->default(0);
             $table->enum('is_headline', ['Y', 'N'])->default('N');

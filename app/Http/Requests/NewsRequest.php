@@ -25,7 +25,8 @@ class NewsRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255|regex:/^[ a-zA-Z0-9]+$/',
+            'summary' => 'required|string|max:150',
             'content' => 'required|string',
             'is_headline' => 'required|string|in:Y,N',
             'banner_image' => 'required|mimes:png,jpg,jpeg|max:4096',

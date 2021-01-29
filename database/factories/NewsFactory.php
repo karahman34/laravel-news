@@ -27,6 +27,7 @@ class NewsFactory extends Factory
         return [
             'banner_image' => 'default.png',
             'title' => preg_replace('/[^ a-zA-Z]+/', '', ucwords($this->faker->sentence(rand(6, 10)))),
+            'summary' => $this->faker->text(150),
             'content' => $this->faker->paragraph(rand(20, 100)),
             'views' => rand(0, 1000),
             'is_headline' => 'N',

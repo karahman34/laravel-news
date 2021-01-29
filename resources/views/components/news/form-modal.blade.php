@@ -56,7 +56,7 @@ $btnType = $action === 'create' ? 'btn-primary' : 'btn-warning';
               <div class="form-group">
                 <label for="is_headline">Is Headline</label>
                 <select name="is_headline" id="is_headline" class="form-control">
-                  <option value="" selected>Is Headline</option>
+                  <option value="" selected disabled>Is Headline</option>
                   <option value="N" @if (isset($news) && $news->is_headline === 'N') selected @endif>No</option>
                   <option value="Y" @if (isset($news) && $news->is_headline === 'Y') selected @endif>Yes</option>
                 </select>
@@ -68,7 +68,7 @@ $btnType = $action === 'create' ? 'btn-primary' : 'btn-warning';
               <div class="form-group">
                 <label for="status">Status</label>
                 <select name="status" id="status" class="form-control">
-                  <option value="" selected>Select Status</option>
+                  <option value="" selected disabled>Select Status</option>
                   <option value="publish" @if (isset($news) && $news->status === 'publish') selected @endif>Publish</option>
                   <option value="draft" @if (isset($news) && $news->status === 'draft') selected @endif>Draft</option>
                   <option value="pending" @if (isset($news) && $news->status === 'pending') selected @endif>Pending</option>
@@ -80,7 +80,15 @@ $btnType = $action === 'create' ? 'btn-primary' : 'btn-warning';
           {{-- Third Row --}}
           <div class="row">
             <div class="col-12 col-md-6">
-              {{-- Banner Image --}}
+              <div class="form-group">
+                <label for="summary">Summary</label>
+                <textarea name="summary" id="summary" class="form-control h-100" placeholder="Summary"
+                  rows="2">{{ $news->summary ?? '' }}</textarea>
+              </div>
+            </div>
+
+            {{-- Banner Image --}}
+            <div class="col-12 col-md-6">
               <div class="form-group">
                 {{-- Image Preview --}}
                 @if (isset($news))
