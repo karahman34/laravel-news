@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\HomeController;
+use App\Http\Livewire\Pages\Search;
+use App\Http\Livewire\Pages\ShowNews;
+use App\Http\Livewire\Pages\WelcomePage;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,10 +17,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Route::prefix('/administrator')->name('administrator.')->group(function () {
     require __DIR__.'/administrator/auth.php';
     require __DIR__.'/administrator/dashboard.php';
@@ -26,3 +26,8 @@ Route::prefix('/administrator')->name('administrator.')->group(function () {
     require __DIR__.'/administrator/news.php';
     require __DIR__.'/administrator/users.php';
 });
+
+Route::get('/', WelcomePage::class)->name('welcome');
+Route::get('/{title}/{news}', ShowNews::class)->name('show_news');
+Route::get('/search', Search::class)->name('search');
+Route::post('/increase-view', [HomeController::class, 'increaseView'])->name('increase_view');

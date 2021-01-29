@@ -4,13 +4,17 @@ namespace App\Providers;
 
 use App\Helpers\MenuHelper;
 use App\Models\Menu;
+use App\Models\News;
+use App\Models\Tag;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    private function setGlobalMenus()
+    private function setAdminMenus()
     {
         View::composer('*', function ($view) {
             $segment1 = request()->segment(1);
@@ -59,6 +63,42 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
+    private function setPopularTags($view)
+    {
+        $tags = Tag::select('name')
+                        ->orderByDesc('views')
+                        ->orderByDesc('created_at')
+                        ->limit(20)
+                        ->get();
+                
+        $view->with('popularTags', $tags);
+    }
+
+    private function setPopularNews($view)
+    {
+        $news = News::select('id', 'banner_image', DB::raw('IF(LENGTH(title) > 75, CONCAT(SUBSTR(title, 1, 75), "..."), title) as title'), 'created_at')
+                        ->where('status', 'publish')
+                        ->whereBetween('created_at', [Carbon::now()->subDays(3), Carbon::now()])
+                        ->orderByDesc('views')
+                        ->orderByDesc('created_at')
+                        ->limit(10)
+                        ->get();
+
+        $view->with('popularNews', $news);
+    }
+
+    private function welcomePage()
+    {
+        View::composer('*', function ($view) {
+            $segment1 = request()->segment(1);
+
+            if ($segment1 !== 'administrator') {
+                $this->setPopularTags($view);
+                $this->setPopularNews($view);
+            }
+        });
+    }
+
     /**
      * Register any application services.
      *
@@ -76,6 +116,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->setGlobalMenus();
+        $this->setAdminMenus();
+        $this->welcomePage();
     }
 }
