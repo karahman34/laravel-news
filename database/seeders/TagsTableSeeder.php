@@ -20,7 +20,7 @@ class TagsTableSeeder extends Seeder
             'metro', 'jabar', 'bet', 'food',
             'destination', 'shopping', 'ticket',
             'travel', 'business', 'news', 'community',
-            'lifestyle'
+            'lifestyle', 'animal',
         ];
 
         foreach ($tags as $tag) {
