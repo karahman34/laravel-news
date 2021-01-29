@@ -1,10 +1,10 @@
 <div class="main-sidebar">
   <aside id="sidebar-wrapper">
     <div class="sidebar-brand">
-      <a href="index.html">{{ env('APP_NAME') }}</a>
+      <a href="{{ route('administrator.dashboard') }}">{{ env('APP_NAME') }}</a>
     </div>
     <div class="sidebar-brand sidebar-brand-sm">
-      <a href="index.html">St</a>
+      <a href="{{ route('administrator.dashboard') }}">{{ env('APP_NAME') }}</a>
     </div>
     <ul class="sidebar-menu">
       <li class="menu-header">General</li>
