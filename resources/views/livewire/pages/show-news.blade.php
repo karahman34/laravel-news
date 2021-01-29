@@ -1,4 +1,4 @@
-<div class="news-show">
+<div class="show-news">
   {{-- News --}}
   <div class="card">
     <div class="card-body">
@@ -8,7 +8,7 @@
         <p class="title mb-0">{{ ucwords($news->title) }}</p>
 
         {{-- Created Time --}}
-        <small class="text-muted" style="font-weight: 500">
+        <small class="created-time">
           {{ $news->created_at->format('D, d F Y H:i') }}
         </small>
       </div>
@@ -23,12 +23,20 @@
         {!! $news->content !!}
       </p>
 
+      {{-- Author --}}
+      <div>
+        <p class="mb-0" style="font-weight: 600">Author: </p>
+        {{ $news->author->name }}
+      </div>
+
       {{-- Tags --}}
-      <p class="font-weight-bold mb-0">Tags: </p>
-      @foreach ($news->tags as $tag)
-        <a href="{{ route('search') }}?tags={{ $tag->name }}"
-          class="btn btn-primary news-tag py-0 my-1">{{ $tag->name }}</a>
-      @endforeach
+      <div class="mt-1">
+        <p class="mb-0" style="font-weight: 600">Tags: </p>
+        @foreach ($news->tags as $tag)
+          <a href="{{ route('search') }}?tags={{ $tag->name }}"
+            class="btn btn-primary news-tag py-0 my-1">{{ $tag->name }}</a>
+        @endforeach
+      </div>
     </div>
   </div>
 
@@ -55,13 +63,17 @@
       margin-right: 4px;
     }
 
-    .news-show .title {
+    .show-news .title {
       font-size: 21px;
       font-weight: 600;
     }
 
+    .show-news .created-time {
+      color: rgb(54, 54, 54);
+    }
+
     @media screen and (min-width: 768px) {
-      .news-show .title {
+      .show-news .title {
         font-size: 28px;
       }
     }
