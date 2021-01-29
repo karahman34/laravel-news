@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\News;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,12 +14,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\User::factory(10)->create();
+        $this->call(TagsTableSeeder::class);
+
+        \App\Models\User::factory(10)
+                            ->has(News::factory()->count(rand(1, 5)))
+                            ->create();
 
         $this->call(MenusTableSeeder::class);
         $this->call(RolesTableSeeder::class);
         $this->call(SuperAdminSeeder::class);
-        $this->call(TagsTableSeeder::class);
         $this->call(AuthorSeeder::class);
+        $this->call(HeadlineNewsSeeder::class);
     }
 }
