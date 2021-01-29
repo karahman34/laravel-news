@@ -55,7 +55,7 @@ class NewsPolicy
      */
     public function update(User $user, News $news)
     {
-        return $user->can($this->prefixPermission . '-update');
+        return $user->can($this->prefixPermission . '-update') && $news->user_id === $user->id;
     }
 
     /**
@@ -67,6 +67,6 @@ class NewsPolicy
      */
     public function delete(User $user, News $news)
     {
-        return $user->can($this->prefixPermission . '-delete');
+        return $user->can($this->prefixPermission . '-delete') && $news->user_id === $user->id;
     }
 }
