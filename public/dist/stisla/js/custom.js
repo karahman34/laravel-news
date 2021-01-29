@@ -168,7 +168,24 @@ $(document).on('submit', 'form.need-ajax', function (e) {
     url,
     data,
     type: method,
-    success: res => {
+  }
+
+  // Setting for file upload.
+  if (enctype === 'multipart/form-data') {
+    options['cache'] = false
+    options['contentType'] = false
+    options['processData'] = false
+  }
+
+  // Remove current validations.
+  removeValidationErrors($form)
+
+  // Show loading spinner.
+  const $btnSpinner = new ButtonSpinner($form.find('button[type=submit]'))
+  $btnSpinner.show()
+
+  $.ajax(options)
+    .done(res => {
       // Close Modal
       if ($form.hasClass('has-modal')) {
         const $modal = $form.closest('.modal')
@@ -186,16 +203,20 @@ $(document).on('submit', 'form.need-ajax', function (e) {
           : $dataTable.DataTable().order([0, 'desc']).draw()
       }
 
+      // Show popup message.
       Swal.fire({
         icon: 'success',
         title: 'Success!',
         text: res.message || 'Action success!',
       })
 
-      // Emit event on document
+      // Reset form.
+      $form.trigger('reset')
+
+      // Emit event on document.
       $(document).trigger('form-ajax.success', [res, $form])
-    },
-    error: err => {
+    })
+    .fail(err => {
       const errCode = err.status
       const errData = err.responseJSON
 
@@ -212,22 +233,7 @@ $(document).on('submit', 'form.need-ajax', function (e) {
 
       // Emit event on document
       $(document).trigger('form-ajax.error', [err, $form])
-    }
-  }
-
-  if (enctype === 'multipart/form-data') {
-    options['cache'] = false
-    options['contentType'] = false
-    options['processData'] = false
-  }
-
-  // Set Loading
-  const $btnSpinner = new ButtonSpinner($form.find('button[type=submit]'))
-  $btnSpinner.show()
-
-  removeValidationErrors($form)
-
-  $.ajax(options)
+    })
     .always(res => {
       // Hide loading spinner
       $btnSpinner.hide()

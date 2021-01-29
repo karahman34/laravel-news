@@ -20,6 +20,9 @@
         <div class="d-inline-block">Hi, {{ auth()->user()->name }}</div>
       </a>
       <div class="dropdown-menu dropdown-menu-right">
+        <a href="{{ route('administrator.profile.index') }}" class="dropdown-item has-icon">
+          <i class="fas fa-user"></i> Profile
+        </a>
         <a href="#" class="logout-btn dropdown-item has-icon text-danger">
           <i class="fas fa-sign-out-alt"></i> Logout
         </a>
