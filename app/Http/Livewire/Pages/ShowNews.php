@@ -9,9 +9,11 @@ class ShowNews extends Component
 {
     public $news;
 
-    public function mount($title, News $news)
+    public function mount($title, int $newsId)
     {
-        $this->news = $news;
+        $this->news = News::publish()
+                            ->where('id', $newsId)
+                            ->firstOrFail();
     }
     
     public function render()

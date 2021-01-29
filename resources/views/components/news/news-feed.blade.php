@@ -4,7 +4,7 @@
       {{-- Content --}}
       <div>
         {{-- Title --}}
-        <a href="{{ route('show_news', ['news' => $news->id, 'title' => preg_replace('/[^a-z0-9]+/', '-', strtolower($news->title))]) }}"
+        <a href="{{ route('show_news', ['newsId' => $news->id, 'title' => preg_replace('/[^a-z0-9]+/', '-', strtolower($news->title))]) }}"
           class="title">
           {{ ucwords($news->title) }}
         </a>

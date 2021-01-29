@@ -8,7 +8,7 @@
     @foreach ($headlineNews as $key => $item)
       <div class="carousel-item @if ($key===0) active @endif">
         <a
-          href="{{ route('show_news', ['news' => $item->id, 'title' => preg_replace('/[^a-z0-9]+/', '-', strtolower($item->title))]) }}">
+          href="{{ route('show_news', ['newsId' => $item->id, 'title' => preg_replace('/[^a-z0-9]+/', '-', strtolower($item->title))]) }}">
           <img src="{{ $item->getBannerImageUrl() }}" class="d-block w-100 banner"
             alt="{{ $item->getBannerImageUrl() }}">
           <div class="carousel-caption">

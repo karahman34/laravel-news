@@ -76,8 +76,8 @@ class AppServiceProvider extends ServiceProvider
 
     private function setPopularNews($view)
     {
-        $news = News::select('id', 'banner_image', DB::raw('IF(LENGTH(title) > 75, CONCAT(SUBSTR(title, 1, 75), "..."), title) as title'), 'created_at')
-                        ->where('status', 'publish')
+        $news = News::publish()
+                        ->select('id', 'banner_image', DB::raw('IF(LENGTH(title) > 75, CONCAT(SUBSTR(title, 1, 75), "..."), title) as title'), 'created_at')
                         ->whereBetween('created_at', [Carbon::now()->subDays(3), Carbon::now()])
                         ->orderByDesc('views')
                         ->orderByDesc('created_at')

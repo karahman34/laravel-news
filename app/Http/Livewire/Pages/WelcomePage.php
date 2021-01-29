@@ -14,16 +14,16 @@ class WelcomePage extends Component
 
     public function render()
     {
-        $headlineNews = News::select('id', 'summary', 'banner_image', 'title', 'created_at')
-                        ->where('status', 'publish')
-                        ->where('is_headline', 'Y')
-                        ->orderByDesc('created_at')
-                        ->limit(4)
-                        ->get();
+        $headlineNews = News::publish()
+                                ->select('id', 'summary', 'banner_image', 'title', 'created_at')
+                                ->where('is_headline', 'Y')
+                                ->orderByDesc('created_at')
+                                ->limit(4)
+                                ->get();
 
-        $news = News::select('id', 'summary', 'banner_image', 'title', 'created_at')
+        $news = News::publish()
+                        ->select('id', 'summary', 'banner_image', 'title', 'created_at')
                         ->with('tags:id,name')
-                        ->where('status', 'publish')
                         ->orderByDesc('created_at')
                         ->paginate(10);
                         

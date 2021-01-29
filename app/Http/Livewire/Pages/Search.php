@@ -24,23 +24,23 @@ class Search extends Component
 
     public function render()
     {
-        $news = News::select('id', 'summary', 'banner_image', 'title', 'created_at')
-                            ->with('tags:id,name')
-                            ->where('status', 'publish')
-                            ->where('title', 'like', '%'.$this->q.'%')
-                            ->when(strlen($this->order) > 0, function ($query) {
-                                return $query->orderBy('created_at', $this->order);
-                            })
-                            ->when(strlen($this->order) === 0, function ($query) {
-                                return $query->orderByDesc('created_at');
-                            })
-                            ->when(strlen($this->tags) > 0, function ($query) {
-                                return $query->whereHas('tags', function ($scopeQuery) {
-                                    return $scopeQuery->whereIn('tags.name', explode(',', $this->tags));
-                                });
-                            })
-                            ->orderByDesc('created_at')
-                            ->paginate(10);
+        $news = News::publish()
+                        ->select('id', 'summary', 'banner_image', 'title', 'created_at')
+                        ->with('tags:id,name')
+                        ->where('title', 'like', '%'.$this->q.'%')
+                        ->when(strlen($this->order) > 0, function ($query) {
+                            return $query->orderBy('created_at', $this->order);
+                        })
+                        ->when(strlen($this->order) === 0, function ($query) {
+                            return $query->orderByDesc('created_at');
+                        })
+                        ->when(strlen($this->tags) > 0, function ($query) {
+                            return $query->whereHas('tags', function ($scopeQuery) {
+                                return $scopeQuery->whereIn('tags.name', explode(',', $this->tags));
+                            });
+                        })
+                        ->orderByDesc('created_at')
+                        ->paginate(10);
 
         return view('livewire.pages.search', ['news' => $news])
                 ->extends('layouts.home.layout')

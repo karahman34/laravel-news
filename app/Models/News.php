@@ -52,4 +52,16 @@ class News extends Model
     {
         return Storage::url($this->banner_image);
     }
+
+    /**
+     * Scope a query to only include published news.
+     *
+     * @param   \Illuminate\Database\Eloquent\Builder   $query
+     *
+     * @return  \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopePublish($query)
+    {
+        return $query->where('status', 'publish');
+    }
 }

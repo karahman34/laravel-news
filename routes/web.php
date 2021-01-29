@@ -28,6 +28,6 @@ Route::prefix('/administrator')->name('administrator.')->group(function () {
 });
 
 Route::get('/', WelcomePage::class)->name('welcome');
-Route::get('/{title}/{news}', ShowNews::class)->name('show_news');
+Route::get('/{title}/{newsId}', ShowNews::class)->name('show_news');
 Route::get('/search', Search::class)->name('search');
 Route::post('/increase-view', [HomeController::class, 'increaseView'])->name('increase_view');
