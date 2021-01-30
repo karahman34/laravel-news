@@ -20,7 +20,10 @@
 
         {{-- Create --}}
         @can('create', App\Models\User::class)
-          @include('components.button.create-btn', ['action' => route('administrator.users.create')])
+          @include('components.button.create-btn', [
+          'action' => route('administrator.users.create'),
+          'modal' => '#user-form-modal'
+          ])
         @endcan
       </div>
     </div>
@@ -95,15 +98,15 @@
 
     function appendCheckBox($tBody, role, selectedRoles) {
       $tBody.append(`
-                      <tr>
-                        <td>${role}</td>
-                        <td>
-                          <div class="form-check d-flex align-items-center justify-content-center mb-1">
-                            <input type="checkbox" class="form-check-input" name="roles[]" value="${role}" ${selectedRoles.some(r => r === role) ? 'checked' : ''} />  
-                          </div>  
-                        </td>
-                      </tr>
-                    `)
+                        <tr>
+                          <td>${role}</td>
+                          <td>
+                            <div class="form-check d-flex align-items-center justify-content-center mb-1">
+                              <input type="checkbox" class="form-check-input" name="roles[]" value="${role}" ${selectedRoles.some(r => r === role) ? 'checked' : ''} />  
+                            </div>  
+                          </td>
+                        </tr>
+                      `)
     }
 
     // When modal open
@@ -185,10 +188,10 @@
 
       if (!filteredRoles.length) {
         $tBody.append(`
-                          <tr>
-                            <td colspan="2" class="text-center">Roles not found.</td>  
-                          </tr>
-                        `)
+                            <tr>
+                              <td colspan="2" class="text-center">Roles not found.</td>  
+                            </tr>
+                          `)
       } else {
         filteredRoles.forEach((role) => appendCheckBox($tBody, role, selectedRoles))
       }

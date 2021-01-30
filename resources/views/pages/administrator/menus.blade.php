@@ -21,7 +21,10 @@
 
         {{-- Create --}}
         @can('create', App\Models\Menu::class)
-          @include('components.button.create-btn', ['action' => route('administrator.menus.create')])
+          @include('components.button.create-btn', [
+          'action' => route('administrator.menus.create'),
+          'modal' => '#form-menu-modal'
+          ])
         @endcan
       </div>
     </div>

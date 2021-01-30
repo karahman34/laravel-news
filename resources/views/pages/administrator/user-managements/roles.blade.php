@@ -20,7 +20,10 @@
 
         {{-- Create --}}
         @can('create', Spatie\Permission\Models\Role::class)
-          @include('components.button.create-btn', ['action' => route('administrator.user-managements.roles.create')])
+          @include('components.button.create-btn', [
+          'action' => route('administrator.user-managements.roles.create'),
+          'modal' => '#form-role-modal'
+          ])
         @endcan
       </div>
     </div>
@@ -84,15 +87,15 @@
 
     function appendCheckBox($tBody, permission, selectedPermissions) {
       $tBody.append(`
-                            <tr>
-                              <td>${permission}</td>
-                              <td>
-                                <div class="form-check d-flex align-items-center justify-content-center mb-1">
-                                  <input type="checkbox" class="form-check-input" name="permissions[]" value="${permission}" ${selectedPermissions.some(p => p === permission) ? 'checked' : ''} />  
-                                </div>  
-                              </td>
-                            </tr>
-                          `)
+                              <tr>
+                                <td>${permission}</td>
+                                <td>
+                                  <div class="form-check d-flex align-items-center justify-content-center mb-1">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="${permission}" ${selectedPermissions.some(p => p === permission) ? 'checked' : ''} />  
+                                  </div>  
+                                </td>
+                              </tr>
+                            `)
     }
 
     // Modal loaded
@@ -181,10 +184,10 @@
 
       if (!filteredPermissions.length) {
         $tBody.append(`
-                              <tr>
-                                <td colspan="2">Permissions not found.</td>
-                              </tr>
-                            `)
+                                <tr>
+                                  <td colspan="2">Permissions not found.</td>
+                                </tr>
+                              `)
       } else {
         filteredPermissions.forEach((permission) => appendCheckBox($tBody, permission, selectedPermissions))
       }

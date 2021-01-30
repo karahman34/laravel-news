@@ -21,7 +21,10 @@
 
         {{-- Create --}}
         @can('create', App\Models\News::class)
-          @include('components.button.create-btn', ['action' => route('administrator.news.create')])
+          @include('components.button.create-btn', [
+          'action' => route('administrator.news.create'),
+          'modal' => '#news-form-modal'
+          ])
         @endcan
       </div>
     </div>

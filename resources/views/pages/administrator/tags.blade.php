@@ -21,7 +21,10 @@
 
         {{-- Create --}}
         @can('create', App\Models\Tag::class)
-          @include('components.button.create-btn', ['action' => route('administrator.tags.create')])
+          @include('components.button.create-btn', [
+          'action' => route('administrator.tags.create'),
+          'modal' => '#form-tag-modal'
+          ])
         @endcan
       </div>
     </div>
