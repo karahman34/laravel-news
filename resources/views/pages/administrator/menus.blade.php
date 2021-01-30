@@ -9,13 +9,19 @@
       </h4>
 
       <div class="d-flex justify-content-end">
+        {{-- Export --}}
+        @can('export', App\Models\Menu::class)
+          @include('components.button.export-btn', ['action' => route('administrator.menus.export')])
+        @endcan
+
+        {{-- Import --}}
+        @can('import', App\Models\Menu::class)
+          @include('components.button.import-btn', ['action' => route('administrator.menus.import')])
+        @endcan
+
         {{-- Create --}}
-        @can('menus-create')
-          <a href="{{ route('administrator.menus.create') }}" class="btn btn-primary btn-modal-trigger"
-            data-modal="#form-menu-modal">
-            <i class="fas fa-plus mr-1"></i>
-            Create
-          </a>
+        @can('create', App\Models\Menu::class)
+          @include('components.button.create-btn', ['action' => route('administrator.menus.create')])
         @endcan
       </div>
     </div>

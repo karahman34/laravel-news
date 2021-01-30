@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\MenusExport;
 use App\Helpers\MenuHelper;
 use App\Http\Requests\MenuRequest;
+use App\Imports\MenusImport;
 use App\Models\Menu;
+use App\Traits\ExcelTrait;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\DataTables;
 
 class MenuController extends Controller
 {
+    use ExcelTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -51,6 +56,48 @@ class MenuController extends Controller
                             })
                             ->rawColumns(['actions'])
                             ->make(true);
+    }
+
+    /**
+    * Export Menus data.
+    *
+    * @param   Request  $request
+    *
+    * @return  mixed
+    */
+    public function export(Request $request)
+    {
+        $allowedFormats = ['xlsx', 'csv'];
+
+        if ($request->get('export') != 1) {
+            return view('components.export-modal', [
+                'action' => route('administrator.menus.export'),
+                'formats' => $allowedFormats,
+            ]);
+        }
+
+        return $this->exportFile($request, new MenusExport($request->take), 'menus', $allowedFormats);
+    }
+
+    /**
+     * Import Menus data.
+     *
+     * @param   Request  $request
+     *
+     * @return  mixed
+     */
+    public function import(Request $request)
+    {
+        if ($request->method() === 'GET') {
+            return view('components.import-modal', [
+                'action' => route('administrator.menus.import'),
+                'dataTable' => '#menu-datatable',
+            ]);
+        }
+
+        $allowedFormats = ['xlsx', 'csv'];
+
+        return $this->importFile($request, new MenusImport, $allowedFormats);
     }
 
     /**
