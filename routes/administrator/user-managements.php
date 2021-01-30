@@ -19,5 +19,10 @@ Route::prefix('user-managements')->name('user-managements.')->middleware(['auth'
     // Permissions
     Route::prefix('permissions')->name('permissions.')->group(function () {
         Route::get('/', [PermissionController::class, 'index'])->name('index');
+        Route::get('/export', [PermissionController::class, 'export'])->name('export');
+        Route::get('/import', [PermissionController::class, 'import'])->name('import');
+    
+        Route::post('/export', [PermissionController::class, 'export']);
+        Route::post('/import', [PermissionController::class, 'import']);
     });
 });

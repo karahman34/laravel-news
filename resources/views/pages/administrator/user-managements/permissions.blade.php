@@ -6,10 +6,22 @@
       <h4>
         {{ ucwords($activeMenu->name) }}
       </h4>
+
+      <div class="d-flex align-items-center">
+        {{-- Export --}}
+        @can('export', Spatie\Permission\Models\Permission::class)
+          @include('components.button.export-btn', ['action' => route('administrator.user-managements.permissions.export')])
+        @endcan
+
+        {{-- Import --}}
+        @can('import', Spatie\Permission\Models\Permission::class)
+          @include('components.button.import-btn', ['action' => route('administrator.user-managements.permissions.import')])
+        @endcan
+      </div>
     </div>
 
     <div class="card-body">
-      <table class="table has-actions" id="menu-datatable">
+      <table class="table has-actions" id="permissions-datatable">
         <thead>
           <tr>
             <th>Id</th>
@@ -25,7 +37,7 @@
 
 @push('script')
   <script>
-    $('#menu-datatable').DataTable({
+    $('#permissions-datatable').DataTable({
       serverSide: true,
       responsive: true,
       ajax: "{{ route('administrator.user-managements.permissions.index') }}",
