@@ -15,13 +15,13 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(TagsTableSeeder::class);
+        $this->call(RolesTableSeeder::class);
 
         \App\Models\User::factory(10)
                             ->has(News::factory()->count(rand(1, 5)))
                             ->create();
 
         $this->call(MenusTableSeeder::class);
-        $this->call(RolesTableSeeder::class);
         $this->call(SuperAdminSeeder::class);
         $this->call(AuthorSeeder::class);
         $this->call(HeadlineNewsSeeder::class);
