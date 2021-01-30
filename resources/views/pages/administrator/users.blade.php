@@ -8,13 +8,19 @@
       </h4>
 
       <div class="d-flex justify-content-end align-items-center">
-        {{-- Create Button --}}
-        @can('users-create')
-          <a href="{{ route('administrator.users.create') }}" class="btn btn-primary btn-modal-trigger"
-            data-modal="#user-form-modal">
-            <i class="fas fa-plus mr-1"></i>
-            Create
-          </a>
+        {{-- Export --}}
+        @can('export', App\Models\User::class)
+          @include('components.button.export-btn', ['action' => route('administrator.users.export')])
+        @endcan
+
+        {{-- Import --}}
+        @can('import', App\Models\User::class)
+          @include('components.button.import-btn', ['action' => route('administrator.users.import')])
+        @endcan
+
+        {{-- Create --}}
+        @can('create', App\Models\User::class)
+          @include('components.button.create-btn', ['action' => route('administrator.users.create')])
         @endcan
       </div>
     </div>
@@ -89,15 +95,15 @@
 
     function appendCheckBox($tBody, role, selectedRoles) {
       $tBody.append(`
-                  <tr>
-                    <td>${role}</td>
-                    <td>
-                      <div class="form-check d-flex align-items-center justify-content-center mb-1">
-                        <input type="checkbox" class="form-check-input" name="roles[]" value="${role}" ${selectedRoles.some(r => r === role) ? 'checked' : ''} />  
-                      </div>  
-                    </td>
-                  </tr>
-                `)
+                      <tr>
+                        <td>${role}</td>
+                        <td>
+                          <div class="form-check d-flex align-items-center justify-content-center mb-1">
+                            <input type="checkbox" class="form-check-input" name="roles[]" value="${role}" ${selectedRoles.some(r => r === role) ? 'checked' : ''} />  
+                          </div>  
+                        </td>
+                      </tr>
+                    `)
     }
 
     // When modal open
@@ -179,10 +185,10 @@
 
       if (!filteredRoles.length) {
         $tBody.append(`
-                      <tr>
-                        <td colspan="2" class="text-center">Roles not found.</td>  
-                      </tr>
-                    `)
+                          <tr>
+                            <td colspan="2" class="text-center">Roles not found.</td>  
+                          </tr>
+                        `)
       } else {
         filteredRoles.forEach((role) => appendCheckBox($tBody, role, selectedRoles))
       }

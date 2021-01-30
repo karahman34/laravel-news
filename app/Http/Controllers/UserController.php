@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UsersExport;
 use App\Http\Requests\UserRequest;
+use App\Imports\UsersImport;
 use App\Models\User;
+use App\Traits\ExcelTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -11,6 +14,8 @@ use Yajra\DataTables\DataTables;
 
 class UserController extends Controller
 {
+    use ExcelTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -56,6 +61,48 @@ class UserController extends Controller
                             })
                             ->rawColumns(['actions'])
                             ->make(true);
+    }
+
+    /**
+    * Export Users data.
+    *
+    * @param   Request  $request
+    *
+    * @return  mixed
+    */
+    public function export(Request $request)
+    {
+        $allowedFormats = ['xlsx', 'csv'];
+
+        if ($request->get('export') != 1) {
+            return view('components.export-modal', [
+                'action' => route('administrator.users.export'),
+                'formats' => $allowedFormats,
+            ]);
+        }
+
+        return $this->exportFile($request, new UsersExport($request->take), 'users', $allowedFormats);
+    }
+
+    /**
+     * Import Users data.
+     *
+     * @param   Request  $request
+     *
+     * @return  mixed
+     */
+    public function import(Request $request)
+    {
+        if ($request->method() === 'GET') {
+            return view('components.import-modal', [
+                'action' => route('administrator.users.import'),
+                'dataTable' => '#users-datatable',
+            ]);
+        }
+
+        $allowedFormats = ['xlsx', 'csv'];
+
+        return $this->importFile($request, new UsersImport, $allowedFormats);
     }
 
     /**
