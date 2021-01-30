@@ -24,5 +24,7 @@ Route::prefix('user-managements')->name('user-managements.')->middleware(['auth'
     
         Route::post('/export', [PermissionController::class, 'export']);
         Route::post('/import', [PermissionController::class, 'import']);
+
+        Route::delete('/{permission}', [PermissionController::class, 'destroy'])->name('destroy');
     });
 });

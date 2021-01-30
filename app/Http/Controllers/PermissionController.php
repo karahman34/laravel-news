@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\PermissionsExport;
 use App\Imports\PermissionsImport;
 use App\Traits\ExcelTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\DataTables;
@@ -30,7 +31,19 @@ class PermissionController extends Controller
             ]);
         }
 
+        $auth = $request->user();
+
         return DataTables::of(Permission::query())
+                            ->addColumn('actions', function (Permission $permission) use ($auth) {
+                                $deleteButton = '';
+
+                                if ($auth->can('delete', $permission)) {
+                                    $deleteButton = '<a href="'.route('administrator.user-managements.permissions.destroy', ['permission' => $permission->id]).'" class="btn btn-danger delete-prompt-trigger has-datatable" data-datatable="#permissions-datatable" data-item-name="'.$permission->name.'"><i class="fas fa-trash"></i></a>';
+                                }
+
+                                return $deleteButton;
+                            })
+                            ->rawColumns(['actions'])
                             ->make(true);
     }
 
@@ -78,5 +91,25 @@ class PermissionController extends Controller
         $allowedFormats = ['xlsx', 'csv'];
 
         return $this->importFile($request, new PermissionsImport, $allowedFormats);
+    }
+
+    /**
+     * Delete Permission data.
+     *
+     * @param   Permission  $permission
+     *
+     * @return  JsonResponse
+     */
+    public function destroy(Permission $permission)
+    {
+        $this->authorize('delete', $permission);
+
+        $permission->delete();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Permission successfully deleted.',
+            'data' => $permission
+        ]);
     }
 }

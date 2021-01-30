@@ -28,6 +28,7 @@
             <th>Name</th>
             <th>Created At</th>
             <th>Updated At</th>
+            <th>Actions</th>
           </tr>
         </thead>
       </table>
@@ -55,7 +56,18 @@
         render: function(data) {
           return moment(data).calendar()
         }
-      }, ]
+      }, {
+        data: 'actions',
+        orderable: false,
+        searchable: false,
+        render: function(data) {
+          if (!data.length) {
+            return `<span class="text-muted font-italic">No Actions</span>`
+          }
+
+          return data
+        }
+      }]
     })
 
   </script>
