@@ -8,13 +8,19 @@
       </h4>
 
       <div class="d-flex justify-content-end">
+        {{-- Export --}}
+        @can('export', Spatie\Permission\Models\Role::class)
+          @include('components.button.export-btn', ['action' => route('administrator.user-managements.roles.export')])
+        @endcan
+
+        {{-- Import --}}
+        @can('import', Spatie\Permission\Models\Role::class)
+          @include('components.button.import-btn', ['action' => route('administrator.user-managements.roles.import')])
+        @endcan
+
         {{-- Create --}}
-        @can('roles-create')
-          <a href="{{ route('administrator.user-managements.roles.create') }}" class="btn btn-primary btn-modal-trigger"
-            data-modal="#form-role-modal">
-            <i class="fas fa-plus mr-1"></i>
-            Create
-          </a>
+        @can('create', Spatie\Permission\Models\Role::class)
+          @include('components.button.create-btn', ['action' => route('administrator.user-managements.roles.create')])
         @endcan
       </div>
     </div>
@@ -78,15 +84,15 @@
 
     function appendCheckBox($tBody, permission, selectedPermissions) {
       $tBody.append(`
-                    <tr>
-                      <td>${permission}</td>
-                      <td>
-                        <div class="form-check d-flex align-items-center justify-content-center mb-1">
-                          <input type="checkbox" class="form-check-input" name="permissions[]" value="${permission}" ${selectedPermissions.some(p => p === permission) ? 'checked' : ''} />  
-                        </div>  
-                      </td>
-                    </tr>
-                  `)
+                            <tr>
+                              <td>${permission}</td>
+                              <td>
+                                <div class="form-check d-flex align-items-center justify-content-center mb-1">
+                                  <input type="checkbox" class="form-check-input" name="permissions[]" value="${permission}" ${selectedPermissions.some(p => p === permission) ? 'checked' : ''} />  
+                                </div>  
+                              </td>
+                            </tr>
+                          `)
     }
 
     // Modal loaded
@@ -175,10 +181,10 @@
 
       if (!filteredPermissions.length) {
         $tBody.append(`
-                      <tr>
-                        <td colspan="2">Permissions not found.</td>
-                      </tr>
-                    `)
+                              <tr>
+                                <td colspan="2">Permissions not found.</td>
+                              </tr>
+                            `)
       } else {
         filteredPermissions.forEach((permission) => appendCheckBox($tBody, permission, selectedPermissions))
       }

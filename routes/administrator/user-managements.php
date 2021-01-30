@@ -6,10 +6,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('user-managements')->name('user-managements.')->middleware(['auth'])->group(function () {
     // Roles
-    Route::resource('roles', RoleController::class);
     Route::prefix('roles')->name('roles.')->group(function () {
+        Route::get('/export', [RoleController::class, 'export'])->name('export');
+        Route::get('/import', [RoleController::class, 'import'])->name('import');
+    
+        Route::post('/export', [RoleController::class, 'export']);
+        Route::post('/import', [RoleController::class, 'import']);
         Route::post('/{role}/sync-permissions', [RoleController::class, 'syncPermissions'])->name('sync_permissions');
     });
+    Route::resource('roles', RoleController::class);
 
     // Permissions
     Route::prefix('permissions')->name('permissions.')->group(function () {

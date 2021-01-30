@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\RolesExport;
 use App\Http\Requests\RoleRequest;
+use App\Imports\RolesImport;
+use App\Traits\ExcelTrait;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -10,6 +13,8 @@ use Yajra\DataTables\DataTables;
 
 class RoleController extends Controller
 {
+    use ExcelTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -49,6 +54,52 @@ class RoleController extends Controller
                             })
                             ->rawColumns(['actions'])
                             ->make(true);
+    }
+
+    /**
+    * Export Roles data.
+    *
+    * @param   Request  $request
+    *
+    * @return  mixed
+    */
+    public function export(Request $request)
+    {
+        $this->authorize('export', Role::class);
+
+        $allowedFormats = ['xlsx', 'csv'];
+
+        if ($request->get('export') != 1) {
+            return view('components.export-modal', [
+                'action' => route('administrator.user-managements.roles.export'),
+                'formats' => $allowedFormats,
+            ]);
+        }
+
+        return $this->exportFile($request, new RolesExport($request->take), 'roles', $allowedFormats);
+    }
+
+    /**
+     * Import Roles data.
+     *
+     * @param   Request  $request
+     *
+     * @return  mixed
+     */
+    public function import(Request $request)
+    {
+        $this->authorize('import', Role::class);
+
+        if ($request->method() === 'GET') {
+            return view('components.import-modal', [
+                'action' => route('administrator.user-managements.roles.import'),
+                'dataTable' => '#roles-datatable',
+            ]);
+        }
+
+        $allowedFormats = ['xlsx', 'csv'];
+
+        return $this->importFile($request, new RolesImport, $allowedFormats);
     }
 
     /**
