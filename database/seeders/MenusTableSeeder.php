@@ -52,7 +52,7 @@ class MenusTableSeeder extends Seeder
                 'name' => 'menus',
                 'path' => '/administrator/menus',
                 'has_sub_menus' => 'N',
-                'permissions' => ['menus-create', 'menus-update', 'menus-delete', 'menus-view', 'menus-sync_permissions'],
+                'permissions' => ['menus-create', 'menus-update', 'menus-delete', 'menus-view', 'menus-sync_permissions', 'menus-export', 'menus-import'],
             ],
             [
                 'parent_id' => null,
@@ -60,7 +60,7 @@ class MenusTableSeeder extends Seeder
                 'name' => 'tags',
                 'path' => '/administrator/tags',
                 'has_sub_menus' => 'N',
-                'permissions' => ['tags-create', 'tags-update', 'tags-delete', 'tags-view'],
+                'permissions' => ['tags-create', 'tags-update', 'tags-delete', 'tags-view', 'tags-export', 'tags-import'],
             ],
             [
                 'parent_id' => null,
@@ -68,7 +68,7 @@ class MenusTableSeeder extends Seeder
                 'name' => 'news',
                 'path' => '/administrator/news',
                 'has_sub_menus' => 'N',
-                'permissions' => ['news-create', 'news-update', 'news-delete', 'news-view'],
+                'permissions' => ['news-create', 'news-update', 'news-delete', 'news-view', 'news-export', 'news-import'],
             ],
             [
                 'parent_id' => null,
@@ -76,7 +76,7 @@ class MenusTableSeeder extends Seeder
                 'name' => 'users',
                 'path' => '/administrator/users',
                 'has_sub_menus' => 'N',
-                'permissions' => ['users-create', 'users-update', 'users-delete', 'users-view', 'users-sync_roles'],
+                'permissions' => ['users-create', 'users-update', 'users-delete', 'users-view', 'users-sync_roles', 'users-export', 'users-import'],
             ],
             [
                 'parent_id' => null,
@@ -89,13 +89,13 @@ class MenusTableSeeder extends Seeder
                         'name' => 'roles',
                         'path' => '/roles',
                         'has_sub_menus' => 'N',
-                        'permissions' => ['roles-create', 'roles-update', 'roles-delete', 'roles-view', 'roles-sync_permissions'],
+                        'permissions' => ['roles-create', 'roles-update', 'roles-delete', 'roles-view', 'roles-sync_permissions', 'roles-export', 'roles-import'],
                     ],
                     [
                         'name' => 'permissions',
                         'path' => '/permissions',
                         'has_sub_menus' => 'N',
-                        'permissions' => ['permissions-create', 'permissions-update', 'permissions-delete', 'permissions-view'],
+                        'permissions' => ['permissions-create', 'permissions-update', 'permissions-delete', 'permissions-view', 'permissions-export', 'permissions-import'],
                     ],
                 ]
             ]
