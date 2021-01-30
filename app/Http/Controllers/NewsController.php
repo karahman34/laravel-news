@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\NewsExport;
 use App\Http\Requests\NewsRequest;
+use App\Imports\NewsImport;
 use App\Models\News;
+use App\Traits\ExcelTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +15,8 @@ use Yajra\DataTables\DataTables;
 
 class NewsController extends Controller
 {
+    use ExcelTrait;
+
     protected $news_content_image_path = 'news/contents';
     protected $news_banner_image_path = 'news/banners';
 
@@ -70,6 +75,52 @@ class NewsController extends Controller
                             })
                             ->rawColumns(['actions'])
                             ->make(true);
+    }
+
+    /**
+    * Export News data.
+    *
+    * @param   Request  $request
+    *
+    * @return  mixed
+    */
+    public function export(Request $request)
+    {
+        $this->authorize('export', News::class);
+
+        $allowedFormats = ['xlsx', 'csv'];
+
+        if ($request->get('export') != 1) {
+            return view('components.export-modal', [
+                'action' => route('administrator.news.export'),
+                'formats' => $allowedFormats,
+            ]);
+        }
+
+        return $this->exportFile($request, new NewsExport($request->take), 'news', $allowedFormats);
+    }
+
+    /**
+     * Import News data.
+     *
+     * @param   Request  $request
+     *
+     * @return  mixed
+     */
+    public function import(Request $request)
+    {
+        $this->authorize('export', News::class);
+
+        if ($request->method() === 'GET') {
+            return view('components.import-modal', [
+                'action' => route('administrator.news.import'),
+                'dataTable' => '#news-datatable',
+            ]);
+        }
+
+        $allowedFormats = ['xlsx', 'csv'];
+
+        return $this->importFile($request, new NewsImport, $allowedFormats);
     }
 
     /**

@@ -9,13 +9,19 @@
       </h4>
 
       <div class="d-flex justify-content-end align-items-center">
-        @can('news-create')
-          {{-- Create --}}
-          <a href="{{ route('administrator.news.create') }}" class="btn btn-primary btn-modal-trigger"
-            data-modal="#news-form-modal">
-            <i class="fas fa-plus mr-2"></i>
-            Create
-          </a>
+        {{-- Export --}}
+        @can('export', App\Models\News::class)
+          @include('components.button.export-btn', ['action' => route('administrator.news.export')])
+        @endcan
+
+        {{-- Import --}}
+        @can('import', App\Models\News::class)
+          @include('components.button.import-btn', ['action' => route('administrator.news.import')])
+        @endcan
+
+        {{-- Create --}}
+        @can('create', App\Models\News::class)
+          @include('components.button.create-btn', ['action' => route('administrator.news.create')])
         @endcan
       </div>
     </div>
