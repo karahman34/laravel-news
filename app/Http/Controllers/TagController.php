@@ -61,6 +61,8 @@ class TagController extends Controller
      */
     public function export(Request $request)
     {
+        $this->authorize('export', Tag::class);
+
         $allowedFormats = ['xlsx', 'csv'];
 
         if ($request->get('export') != 1) {
@@ -82,6 +84,8 @@ class TagController extends Controller
      */
     public function import(Request $request)
     {
+        $this->authorize('import', Tag::class);
+
         if ($request->method() === 'GET') {
             return view('components.import-modal', [
                 'action' => route('administrator.tags.import'),

@@ -67,6 +67,8 @@ class MenuController extends Controller
     */
     public function export(Request $request)
     {
+        $this->authorize('export', Menu::class);
+
         $allowedFormats = ['xlsx', 'csv'];
 
         if ($request->get('export') != 1) {
@@ -88,6 +90,8 @@ class MenuController extends Controller
      */
     public function import(Request $request)
     {
+        $this->authorize('import', Menu::class);
+
         if ($request->method() === 'GET') {
             return view('components.import-modal', [
                 'action' => route('administrator.menus.import'),

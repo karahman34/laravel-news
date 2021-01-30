@@ -109,7 +109,7 @@ class NewsController extends Controller
      */
     public function import(Request $request)
     {
-        $this->authorize('export', News::class);
+        $this->authorize('import', News::class);
 
         if ($request->method() === 'GET') {
             return view('components.import-modal', [

@@ -66,7 +66,7 @@ class PermissionController extends Controller
      */
     public function import(Request $request)
     {
-        $this->authorize('export', Permission::class);
+        $this->authorize('import', Permission::class);
 
         if ($request->method() === 'GET') {
             return view('components.import-modal', [
