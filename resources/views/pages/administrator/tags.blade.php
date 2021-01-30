@@ -9,13 +9,19 @@
       </h4>
 
       <div class="d-flex justify-content-end align-items-center">
+        {{-- Export --}}
+        @can('export', App\Models\Tag::class)
+          @include('components.button.export-btn', ['action' => route('administrator.tags.export')])
+        @endcan
+
+        {{-- Import --}}
+        @can('import', App\Models\Tag::class)
+          @include('components.button.import-btn', ['action' => route('administrator.tags.import')])
+        @endcan
+
         {{-- Create --}}
-        @can('tags-create')
-          <a href="{{ route('administrator.tags.create') }}" class="btn btn-primary btn-modal-trigger"
-            data-modal="#form-tag-modal">
-            <i class="fas fa-plus mr-2"></i>
-            Create
-          </a>
+        @can('create', App\Models\Tag::class)
+          @include('components.button.create-btn', ['action' => route('administrator.tags.create')])
         @endcan
       </div>
     </div>

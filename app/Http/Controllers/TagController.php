@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TagsExport;
 use App\Http\Requests\TagRequest;
+use App\Imports\TagsImport;
 use App\Models\Tag;
+use App\Traits\ExcelTrait;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\DataTables;
 
 class TagController extends Controller
 {
+    use ExcelTrait;
+
     /**
      * Display a listing of the resource.
      * @param  \Illuminate\Http\Request  $request
@@ -43,6 +50,48 @@ class TagController extends Controller
                             })
                             ->rawColumns(['actions'])
                             ->make(true);
+    }
+
+    /**
+     * Export tags data.
+     *
+     * @param   Request  $request
+     *
+     * @return  mixed
+     */
+    public function export(Request $request)
+    {
+        $allowedFormats = ['xlsx', 'csv'];
+
+        if ($request->get('export') != 1) {
+            return view('components.export-modal', [
+                'action' => route('administrator.tags.export'),
+                'formats' => $allowedFormats,
+            ]);
+        }
+
+        return $this->exportFile($request, new TagsExport($request->take), 'tags', $allowedFormats);
+    }
+
+    /**
+     * Import Tags data.
+     *
+     * @param   Request  $request
+     *
+     * @return  mixed
+     */
+    public function import(Request $request)
+    {
+        if ($request->method() === 'GET') {
+            return view('components.import-modal', [
+                'action' => route('administrator.tags.import'),
+                'dataTable' => '#tags-datatable',
+            ]);
+        }
+
+        $allowedFormats = ['xlsx', 'csv'];
+
+        return $this->importFile($request, new TagsImport, $allowedFormats);
     }
 
     /**
