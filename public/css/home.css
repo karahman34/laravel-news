@@ -8,6 +8,29 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f3f3f3;
+    color: rgb(85, 85, 85);
+    font-family: "Nunito", sans-serif;
+}
+
+:root {
+    --primary-color: rgb(82, 49, 230);
+}
+
+.bg-primary,
+.btn-primary,
+.page-item.active .page-link {
+    background-color: var(--primary-color) !important;
+}
+
+.page-item.active .page-link {
+    color: white !important;
+    border-color: var(--primary-color) !important;
+}
+
+a,
+.page-link,
+.text-primary {
+    color: var(--primary-color) !important;
 }
 
 #my-navbar {
@@ -29,15 +52,15 @@ body {
     align-items: center;
 }
 
+#my-navbar .nav-item.search form {
+    width: 100%;
+}
+
 #my-navbar .nav-item.search i {
     position: absolute;
     top: 29%;
     left: 15px;
     font-size: 14px;
-}
-
-#my-navbar .nav-item.search form {
-    width: 100%;
 }
 
 #my-navbar .nav-item.search input {
@@ -46,7 +69,7 @@ body {
     padding-left: 2.25rem;
     padding-right: 0.5rem;
     width: 100%;
-    color: #292929;
+    color: #313131;
     border-radius: 5px;
     border: 1px solid rgba(0, 0, 0, 0.2);
 }
@@ -69,11 +92,11 @@ body {
 }
 
 #navbar-tags .nav-item:hover {
-    background-color: #1565bb;
+    background-color: #3c21b3 !important;
 }
 
 #navbar-tags .nav-link {
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
 }
 
@@ -103,11 +126,11 @@ body {
 
 .news-feed .title {
     font-weight: 600;
-    font-size: 22px;
+    font-size: 21px;
 }
 
 .news-feed .summary {
-    color: rgb(105, 105, 105);
+    color: rgb(122, 122, 122);
 }
 
 .news-feed .banner {
@@ -155,9 +178,19 @@ body {
     .news-feed .tags-block {
         font-size: 14px;
     }
+
+    #my-navbar .nav-item {
+        margin: 2px 0;
+    }
+
+    #my-navbar .nav-item.social {
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+    }
 }
 
-/* Table */
+/* Tablet */
 @media screen and (min-width: 768px) {
     #headlineNewsIndicator .banner {
         min-height: 300px;
@@ -183,18 +216,14 @@ body {
     }
 
     #my-navbar .nav-item.search input {
-        outline: none;
-        padding: 0.25rem 0;
-        padding-left: 2.25rem;
-        padding-right: 0.25rem;
         border: none;
         width: 100%;
-        border-radius: 0;
+        border-radius: 4px;
         transition: all 500ms ease-out;
     }
 
     #my-navbar .nav-item.search input:focus {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+        background-color: white;
     }
 
     #my-navbar .social .nav-link {

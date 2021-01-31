@@ -26,7 +26,7 @@
       {{-- Author --}}
       <div>
         <p class="mb-0" style="font-weight: 600">Author: </p>
-        {{ $news->author->name }}
+        <span>{{ $news->author->name }}</span>
       </div>
 
       {{-- Tags --}}
@@ -34,7 +34,7 @@
         <p class="mb-0" style="font-weight: 600">Tags: </p>
         @foreach ($news->tags as $tag)
           <a href="{{ route('search') }}?tags={{ $tag->name }}"
-            class="btn btn-primary news-tag py-0 my-1">{{ $tag->name }}</a>
+            class="btn btn-primary text-white news-tag py-0 my-1">{{ $tag->name }}</a>
         @endforeach
       </div>
     </div>

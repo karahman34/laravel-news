@@ -16,7 +16,7 @@
         <small class="text-muted time">
           {{-- Time --}}
           <div class="my-1">
-            <i class="fas fa-clock"></i>
+            <i class="fas fa-clock mr-1"></i>
             {{ $news->created_at->diffForHumans() }}
           </div>
 

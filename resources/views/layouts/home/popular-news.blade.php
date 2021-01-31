@@ -10,10 +10,10 @@
       <div>
         <a
           href="{{ route('show_news', ['newsId' => $news->id, 'title' => preg_replace('/[^a-z0-9]+/', '-', strtolower($news->title))]) }}">
-          <h6 class="mb-0">{{ ucwords($news->title) }}</h6>
+          <h6 class="mb-0 text-dark">{{ ucwords($news->title) }}</h6>
         </a>
         <small class="text-muted">
-          <i class="far fa-clock"></i>
+          <i class="far fa-clock mr-1"></i>
           {{ $news->created_at->diffForHumans() }}
         </small>
       </div>

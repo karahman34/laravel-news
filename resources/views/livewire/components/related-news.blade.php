@@ -3,8 +3,8 @@
   <div class="d-flex justify-content-between align-items-center">
     <h5 class="mb-0">Related News</h5>
 
-    <a href="{{ route('search') }}?tags={{ $news->tags->pluck('name')->join(',') }}" class="btn btn-primary py-1">SEE
-      MORE</a>
+    <a href="{{ route('search') }}?tags={{ $news->tags->pluck('name')->join(',') }}"
+      class="btn btn-primary text-white py-1">See More</a>
   </div>
 
   <div class="card mt-2">
