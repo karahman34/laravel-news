@@ -22,6 +22,16 @@ class Search extends Component
         'tags' => ['except' => ''],
     ];
 
+    public function updatingOrder()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingQ()
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         $news = News::publish()
