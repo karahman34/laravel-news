@@ -2,7 +2,7 @@
   <h5>Results for: "{{ $q }}"</h5>
 
   {{-- Filter Block --}}
-  <div id="filter-block" class="d-flex align-items-center justify-content-between mb-2">
+  <div id="filter-block" class="d-flex align-items-center justify-content-between mb-3">
     {{-- Order & Tags --}}
     <div class="d-flex align-items-center">
       <div>
@@ -31,22 +31,6 @@
     </div>
   </div>
 
-  {{-- Loading State --}}
-  <div wire:loading>
-    <h4 class="text-muted mt-3">
-      Searching news...
-    </h4>
-  </div>
-
-  {{-- Empty Block --}}
-  @if (count($news) === 0)
-    <div wire:loading.remove>
-      <h4 class="text-muted mt-3">
-        News not found.
-      </h4>
-    </div>
-  @endif
-
   {{-- List of News --}}
   <div wire:loading.remove>
     @foreach ($news as $item)
@@ -54,10 +38,22 @@
     @endforeach
   </div>
 
-  {{-- Pagination --}}
-  <div class="d-flex justify-content-center mt-4">
-    {{ $news->links() }}
+  {{-- Loading --}}
+  <div class="mt-4">
+    @include('components.home.loading')
   </div>
+
+  {{-- Empty Block --}}
+  @if (count($news) === 0)
+    <div wire:loading.remove>
+      <div class="h4 text-center text-muted mt-4">
+        News not found.
+      </div>
+    </div>
+  @endif
+
+  {{-- Pagination --}}
+  @include('components.home.pagination', ['data' => $news])
 </div>
 
 @push('css')

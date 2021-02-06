@@ -5,12 +5,15 @@
   <br>
 
   {{-- List of News --}}
-  @foreach ($news as $item)
-    @include('components.news.news-feed', ['news' => $item])
-  @endforeach
+  <div wire:loading.remove>
+    @foreach ($news as $item)
+      @include('components.news.news-feed', ['news' => $item])
+    @endforeach
+  </div>
+
+  {{-- Loading --}}
+  @include('components.home.loading')
 
   {{-- Pagination --}}
-  <div class="d-flex justify-content-center mt-4">
-    {{ $news->links() }}
-  </div>
+  @include('components.home.pagination', ['data' => $news])
 </div>
