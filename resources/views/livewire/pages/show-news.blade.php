@@ -3,11 +3,11 @@
   <div class="card">
     <div class="card-body">
       {{-- Title --}}
-      <div class="card-title mb-1">
+      <div class="card-title">
         {{-- Title --}}
         <p class="title mb-2">{{ ucwords($news->title) }}</p>
 
-        <div class="title-footer d-flex justify-content-between">
+        <div class="title-footer d-flex justify-content-between align-items-center">
           {{-- Created Time --}}
           <small class="created-time">
             {{ $news->created_at->format('D, d F Y H:i') }}
@@ -30,12 +30,12 @@
       <div class="dash-banner-divider"></div>
 
       {{-- Banner --}}
-      <img src="{{ $news->getBannerImageUrl() }}" alt="" class="img-fluid">
+      <img src="{{ $news->getBannerImageUrl() }}" alt="" class="banner">
 
-      {{-- Body --}}
-      <p class="mb-0 mt-3 mb-2">
+      {{-- Content --}}
+      <div class="news-content mb-0 mt-3 mb-2">
         {!! $news->content !!}
-      </p>
+      </div>
 
       {{-- Author --}}
       <div>
@@ -86,11 +86,35 @@
       color: rgb(54, 54, 54);
     }
 
+    .show-news .card-title {
+      margin-bottom: 0.25rem !important;
+    }
+
+    .show-news .banner {
+      width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+    }
+
+    .show-news .news-content img {
+      max-width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+    }
+
     .share-buttons a:not(:last-child) {
       margin-right: 0.1rem;
     }
 
     @media screen and (max-width: 640px) {
+      .show-news .card-title {
+        margin-bottom: 0.5rem !important;
+      }
+
+      .show-news .title {
+        text-align: center;
+      }
+
       .show-news .title-footer {
         flex-direction: column;
       }
