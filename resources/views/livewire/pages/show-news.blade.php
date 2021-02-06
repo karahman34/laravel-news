@@ -3,14 +3,28 @@
   <div class="card">
     <div class="card-body">
       {{-- Title --}}
-      <div class="card-title mb-2">
+      <div class="card-title mb-1">
         {{-- Title --}}
-        <p class="title mb-0">{{ ucwords($news->title) }}</p>
+        <p class="title mb-2">{{ ucwords($news->title) }}</p>
 
-        {{-- Created Time --}}
-        <small class="created-time">
-          {{ $news->created_at->format('D, d F Y H:i') }}
-        </small>
+        <div class="title-footer d-flex justify-content-between">
+          {{-- Created Time --}}
+          <small class="created-time">
+            {{ $news->created_at->format('D, d F Y H:i') }}
+          </small>
+
+          {{-- Share Buttons --}}
+          <div class="d-flex align-items-center">
+            <span class="text-muted mr-2">Share: </span>
+
+            <div class="share-buttons a2a_kit a2a_kit_size_24 a2a_default_style">
+              <a class="a2a_button_facebook"></a>
+              <a class="a2a_button_twitter"></a>
+              <a class="a2a_button_google_gmail"></a>
+              <a class="a2a_button_copy_link"></a>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="dash-banner-divider"></div>
@@ -52,7 +66,7 @@
       width: 100%;
       height: 5px;
       background-color: rgb(211, 211, 211);
-      margin-bottom: 17px;
+      margin-bottom: 1rem;
     }
 
     .news-tag {
@@ -72,6 +86,20 @@
       color: rgb(54, 54, 54);
     }
 
+    .share-buttons a:not(:last-child) {
+      margin-right: 0.1rem;
+    }
+
+    @media screen and (max-width: 640px) {
+      .show-news .title-footer {
+        flex-direction: column;
+      }
+
+      .show-news .title-footer .created-time {
+        margin-bottom: 0.25rem;
+      }
+    }
+
     @media screen and (min-width: 768px) {
       .show-news .title {
         font-size: 28px;
@@ -82,14 +110,22 @@
 @endpush
 
 @push('script')
+  <script src="https://static.addtoany.com/menu/page.js"></script>
   <script>
-    // Increase views
     $(document).ready(function() {
+      // Increase views.
       $.post("{{ route('increase_view') }}", {
           news_id: "{{ $news->id }}",
           _token: $('meta[name=csrf-token]').attr('content')
         })
         .fail(() => {})
+
+      // Set link for share buttons.
+      const href = window.location.href
+      $('.share-buttons a').each(function() {
+        const anchor = $(this)
+        anchor.attr('href', href)
+      })
     })
 
   </script>
